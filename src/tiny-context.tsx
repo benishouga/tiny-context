@@ -26,39 +26,37 @@ export function createTinyContext<S, A extends Actions<S, A>>(internalActions: I
         next({ ...state })
           .then(next.resolve)
           .catch(next.reject)
-          .finally(() => (busy = false));
+          .finally(() => {
+            busy = false;
+            wake();
+          });
       } else {
         busy = false;
       }
-    }, [state, count]);
+    }, [count]);
 
-    const convert = () => {
-      const obj: { [name: string]: (state: S, ...args: any) => Promise<void> | Promise<S> } = internalActions as any;
-      const result: { [name: string]: (...args: any) => Promise<void> } = {};
-      const packAction = (original: (state: S, ...args: any) => Promise<void> | Promise<S>) => (...args: any) =>
-        new Promise<void>((resolve, reject) => {
-          const task = async (state: S) => {
-            try {
-              const newState = await original(state, ...args);
-              if (newState !== null && newState !== undefined) {
-                setState({ ...newState });
-              }
-            } catch (e) {
-              reject(e);
-            }
-          };
-          task.resolve = resolve;
-          task.reject = reject;
-          queue.push(task);
-          wake();
-        });
-
-      Object.keys(obj).forEach(name => {
-        result[name] = packAction(obj[name]);
+    const toExternalAction = (action: (state: S, ...args: any) => Promise<void> | Promise<S>) => (...args: any) =>
+      new Promise<void>((resolve, reject) => {
+        const task = async (state: S) => {
+          const newState = await action(state, ...args);
+          if (newState !== null && newState !== undefined) {
+            setState({ ...newState });
+          }
+        };
+        task.resolve = resolve;
+        task.reject = reject;
+        queue.push(task);
+        wake();
       });
-      return result as A;
+
+    const toExternal = (actions: InternalActions<S, A>) => {
+      const internal: { [name: string]: (state: S, ...args: any) => Promise<void> | Promise<S> } = actions as any;
+      const external: { [name: string]: (...args: any) => Promise<void> } = Object.fromEntries(
+        Object.entries(internal).map(([name, method]) => [name, toExternalAction(method)])
+      );
+      return external as A;
     };
-    return <Context.Provider value={{ state, actions: convert() }}>{children}</Context.Provider>;
+    return <Context.Provider value={{ state, actions: toExternal(internalActions) }}>{children}</Context.Provider>;
   };
 
   return { Provider, useContext: () => useContext(Context) };

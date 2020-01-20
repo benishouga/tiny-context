@@ -1,7 +1,7 @@
 const path = require('path');
 
 module.exports = {
-  entry: './src/index.tsx',
+  entry: './examples/main.tsx',
   output: {
     filename: 'main.js',
     path: path.resolve(__dirname, 'docs')
@@ -17,7 +17,14 @@ module.exports = {
     rules: [
       {
         test: /\.tsx?$/,
-        use: [{ loader: 'ts-loader' }]
+        use: [
+          {
+            loader: 'ts-loader',
+            options: {
+              configFile: 'tsconfig-example.json'
+            }
+          }
+        ]
       }
     ]
   }

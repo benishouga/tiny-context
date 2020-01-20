@@ -1,6 +1,5 @@
 import React from 'react';
-import { createTinyContext } from '../tiny-context';
-import { wait } from '../wait';
+import { createTinyContext } from '../src/tiny-context';
 
 export interface Todo {
   text: string;
@@ -23,7 +22,7 @@ const { Provider, useContext } = createTinyContext<TodoState, TodoActions>({
   showProgress: async state => ({ ...state, progress: true }),
   hideProgress: async state => ({ ...state, progress: false }),
   add: async (state, todo) => {
-    await wait();
+    await new Promise(resolve => setTimeout(resolve, 500));
     state.todos.push(todo);
     return state;
   },
