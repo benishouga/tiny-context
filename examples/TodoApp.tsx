@@ -6,10 +6,8 @@ import { TodoList } from './TodoList';
 const TodoApp = () => {
   return (
     <TodoProvider>
-      <div>
-        <AdditionalForm />
-        <TodoList />
-      </div>
+      <AdditionalForm />
+      <TodoList />
     </TodoProvider>
   );
 };

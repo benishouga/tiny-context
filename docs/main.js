@@ -190,9 +190,8 @@ __webpack_require__.r(__webpack_exports__);
 
 var TodoApp = function () {
     return (react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_TodoProvider__WEBPACK_IMPORTED_MODULE_1__["TodoProvider"], null,
-        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null,
-            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_AdditionalForm__WEBPACK_IMPORTED_MODULE_2__["AdditionalForm"], null),
-            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_TodoList__WEBPACK_IMPORTED_MODULE_3__["TodoList"], null))));
+        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_AdditionalForm__WEBPACK_IMPORTED_MODULE_2__["AdditionalForm"], null),
+        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_TodoList__WEBPACK_IMPORTED_MODULE_3__["TodoList"], null)));
 };
 /* harmony default export */ __webpack_exports__["default"] = (TodoApp);
 
@@ -299,18 +298,14 @@ var __generator = (undefined && undefined.__generator) || function (thisArg, bod
 
 
 var _a = Object(_src_tiny_context__WEBPACK_IMPORTED_MODULE_1__["createTinyContext"])({
-    showProgress: function (state) { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
-        return [2 /*return*/, (__assign(__assign({}, state), { progress: true }))];
-    }); }); },
-    hideProgress: function (state) { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
-        return [2 /*return*/, (__assign(__assign({}, state), { progress: false }))];
-    }); }); },
+    showProgress: function (state) { return (__assign(__assign({}, state), { progress: true })); },
+    hideProgress: function (state) { return (__assign(__assign({}, state), { progress: false })); },
     add: function (state, todo) { return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 500); })];
                 case 1:
-                    _a.sent();
+                    _a.sent(); // network
                     state.todos.push(todo);
                     return [2 /*return*/, state];
             }
@@ -32247,6 +32242,19 @@ var __spreadArrays = (undefined && undefined.__spreadArrays) || function () {
     return r;
 };
 
+var extract = function (obj, ignores) {
+    if (ignores === void 0) { ignores = IGNORES; }
+    var t = obj;
+    var set = new Set();
+    while (t) {
+        Object.getOwnPropertyNames(t)
+            .filter(function (n) { return !ignores.includes(n); })
+            .forEach(function (n) { return set.add(n); });
+        t = Object.getPrototypeOf(t);
+    }
+    return Array.from(set);
+};
+var IGNORES = extract({}, []);
 function createTinyContext(internalActions) {
     var _this = this;
     var Context = Object(react__WEBPACK_IMPORTED_MODULE_0__["createContext"])({});
@@ -32275,7 +32283,7 @@ function createTinyContext(internalActions) {
                 busy = false;
             }
         }, [count]);
-        var toExternalAction = function (action) { return function () {
+        var convertAction = function (actions, action) { return function () {
             var args = [];
             for (var _i = 0; _i < arguments.length; _i++) {
                 args[_i] = arguments[_i];
@@ -32285,7 +32293,7 @@ function createTinyContext(internalActions) {
                     var newState;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
-                            case 0: return [4 /*yield*/, action.apply(void 0, __spreadArrays([state], args))];
+                            case 0: return [4 /*yield*/, action.bind(actions).apply(void 0, __spreadArrays([state], args))];
                             case 1:
                                 newState = _a.sent();
                                 if (newState !== null && newState !== undefined) {
@@ -32301,15 +32309,12 @@ function createTinyContext(internalActions) {
                 wake();
             });
         }; };
-        var toExternal = function (actions) {
+        var convert = function (actions) {
             var internal = actions;
-            var external = Object.fromEntries(Object.entries(internal).map(function (_a) {
-                var name = _a[0], method = _a[1];
-                return [name, toExternalAction(method)];
-            }));
+            var external = Object.fromEntries(extract(internal).map(function (name) { return [name, convertAction(actions, internal[name])]; }));
             return external;
         };
-        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Context.Provider, { value: { state: state, actions: toExternal(internalActions) } }, children);
+        return Object(react__WEBPACK_IMPORTED_MODULE_0__["useMemo"])(function () { return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Context.Provider, { value: { state: state, actions: convert(internalActions) } }, children); }, [state]);
     };
     return { Provider: Provider, useContext: function () { return Object(react__WEBPACK_IMPORTED_MODULE_0__["useContext"])(Context); } };
 }

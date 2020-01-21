@@ -1,11 +1,26 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 
 type Action<S> = (...args: any) => Promise<void> | Promise<S>;
 type Actions<S, A> = { [P in keyof A]: Action<S> };
-type InternalActions<S, A extends Actions<S, A>> = {
-  [P in keyof A]: (state: S, ...args: Parameters<A[P]>) => Promise<void> | Promise<S>;
-};
 type TaskQueue<S> = ((s: S) => Promise<void>) & { resolve: () => void; reject: () => void };
+
+export type InternalActions<S, A extends Actions<S, A>> = {
+  [P in keyof A]: (state: S, ...args: Parameters<A[P]>) => void | S | Promise<void> | Promise<S>;
+};
+
+const extract = (obj: object, ignores = IGNORES) => {
+  let t = obj;
+  const set: Set<string> = new Set();
+  while (t) {
+    Object.getOwnPropertyNames(t)
+      .filter(n => !ignores.includes(n))
+      .forEach(n => set.add(n));
+    t = Object.getPrototypeOf(t);
+  }
+  return Array.from(set);
+};
+
+const IGNORES: string[] = extract({}, []);
 
 export function createTinyContext<S, A extends Actions<S, A>>(internalActions: InternalActions<S, A>) {
   const Context = createContext<{ state: S; actions: A }>({} as any);
@@ -13,7 +28,7 @@ export function createTinyContext<S, A extends Actions<S, A>>(internalActions: I
   const queue: TaskQueue<S>[] = [];
   let busy = false;
 
-  const Provider = ({ value, children }: { value: S; children: React.ReactChild }) => {
+  const Provider = ({ value, children }: { value: S; children: React.ReactNode }) => {
     const [state, setState] = useState<S>(value);
     const [count, setCount] = useState(0);
     const wake = () => setCount(c => c + 1);
@@ -35,10 +50,13 @@ export function createTinyContext<S, A extends Actions<S, A>>(internalActions: I
       }
     }, [count]);
 
-    const toExternalAction = (action: (state: S, ...args: any) => Promise<void> | Promise<S>) => (...args: any) =>
+    const convertAction = (
+      actions: InternalActions<S, A>,
+      action: (state: S, ...args: any) => Promise<void> | Promise<S>
+    ) => (...args: any) =>
       new Promise<void>((resolve, reject) => {
         const task = async (state: S) => {
-          const newState = await action(state, ...args);
+          const newState = await action.bind(actions)(state, ...args);
           if (newState !== null && newState !== undefined) {
             setState({ ...newState });
           }
@@ -49,14 +67,17 @@ export function createTinyContext<S, A extends Actions<S, A>>(internalActions: I
         wake();
       });
 
-    const toExternal = (actions: InternalActions<S, A>) => {
+    const convert = (actions: InternalActions<S, A>) => {
       const internal: { [name: string]: (state: S, ...args: any) => Promise<void> | Promise<S> } = actions as any;
       const external: { [name: string]: (...args: any) => Promise<void> } = Object.fromEntries(
-        Object.entries(internal).map(([name, method]) => [name, toExternalAction(method)])
+        extract(internal).map(name => [name, convertAction(actions, internal[name])])
       );
       return external as A;
     };
-    return <Context.Provider value={{ state, actions: toExternal(internalActions) }}>{children}</Context.Provider>;
+    return useMemo(
+      () => <Context.Provider value={{ state, actions: convert(internalActions) }}>{children}</Context.Provider>,
+      [state]
+    );
   };
 
   return { Provider, useContext: () => useContext(Context) };

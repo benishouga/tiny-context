@@ -19,10 +19,10 @@ export interface TodoActions {
 }
 
 const { Provider, useContext } = createTinyContext<TodoState, TodoActions>({
-  showProgress: async state => ({ ...state, progress: true }),
-  hideProgress: async state => ({ ...state, progress: false }),
+  showProgress: state => ({ ...state, progress: true }),
+  hideProgress: state => ({ ...state, progress: false }),
   add: async (state, todo) => {
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise(resolve => setTimeout(resolve, 500)); // network
     state.todos.push(todo);
     return state;
   },
@@ -34,6 +34,6 @@ const { Provider, useContext } = createTinyContext<TodoState, TodoActions>({
 
 export const useTodoContext = useContext;
 
-export const TodoProvider = ({ children }: { children: React.ReactChild }): JSX.Element => {
+export const TodoProvider = ({ children }: { children: React.ReactNode }): JSX.Element => {
   return <Provider value={{ todos: [], progress: false }}>{children}</Provider>;
 };
