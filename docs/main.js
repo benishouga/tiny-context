@@ -32311,7 +32311,8 @@ function createTinyContext(internalActions) {
         }; };
         var convert = function (actions) {
             var internal = actions;
-            var external = Object.fromEntries(extract(internal).map(function (name) { return [name, convertAction(actions, internal[name])]; }));
+            var external = {};
+            extract(internal).forEach(function (name) { return (external[name] = convertAction(actions, internal[name])); });
             return external;
         };
         return Object(react__WEBPACK_IMPORTED_MODULE_0__["useMemo"])(function () { return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Context.Provider, { value: { state: state, actions: convert(internalActions) } }, children); }, [state]);

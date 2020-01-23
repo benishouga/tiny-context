@@ -69,9 +69,8 @@ export function createTinyContext<S, A extends Actions<S, A>>(internalActions: I
 
     const convert = (actions: InternalActions<S, A>) => {
       const internal: { [name: string]: (state: S, ...args: any) => Promise<void> | Promise<S> } = actions as any;
-      const external: { [name: string]: (...args: any) => Promise<void> } = Object.fromEntries(
-        extract(internal).map(name => [name, convertAction(actions, internal[name])])
-      );
+      const external: { [name: string]: (...args: any) => Promise<void> } = {};
+      extract(internal).forEach(name => (external[name] = convertAction(actions, internal[name])));
       return external as A;
     };
     return useMemo(

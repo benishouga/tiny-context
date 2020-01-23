@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es5",
     "outDir": "dist",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": ["dom", "dom.iterable", "ES2018"],
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,

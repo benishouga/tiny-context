@@ -122,7 +122,8 @@ export function createTinyContext(internalActions) {
         }; };
         var convert = function (actions) {
             var internal = actions;
-            var external = Object.fromEntries(extract(internal).map(function (name) { return [name, convertAction(actions, internal[name])]; }));
+            var external = {};
+            extract(internal).forEach(function (name) { return (external[name] = convertAction(actions, internal[name])); });
             return external;
         };
         return useMemo(function () { return React.createElement(Context.Provider, { value: { state: state, actions: convert(internalActions) } }, children); }, [state]);
