@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { render, fireEvent, screen, waitForDomChange, wait } from '@testing-library/react';
+import { render, fireEvent, screen, wait } from '@testing-library/react';
 
 import { createTinyContext, InternalActions } from '../src/tiny-context';
 
