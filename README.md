@@ -65,7 +65,7 @@ interface CounterState {
 
 interface CounterActions {
   increment: () => Promise<void>;
-  doNothing: () => Promise<void>;
+  decrement: () => Promise<void>;
 }
 
 const { Provider, useContext } = createTinyContext<CounterState, CounterActions>({
