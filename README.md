@@ -13,6 +13,48 @@ npm install tiny-context
 
 ## Usage
 
+JavaScript
+
+```jsx
+import React from 'react';
+import { createTinyContext } from 'tiny-context';
+
+const { Provider, useContext } = createTinyContext({
+  increment: state => ({ ...state, count: state.count + 1 }),
+  decrement: state => ({ ...state, count: state.count - 1 })
+});
+
+const Buttons = () => {
+  const {
+    actions: { increment, decrement }
+  } = useContext();
+  return (
+    <span>
+      <button onClick={increment}>+</button>
+      <button onClick={decrement}>-</button>
+    </span>
+  );
+};
+
+const Display = () => {
+  const {
+    state: { count }
+  } = useContext();
+  return <span>{count}</span>;
+};
+
+const CounterApp = () => {
+  return (
+    <Provider value={{ count: 0 }}>
+      <Buttons />
+      <Display />
+    </Provider>
+  );
+};
+```
+
+TypeScript
+
 ```tsx
 import React from 'react';
 import { createTinyContext } from 'tiny-context';
@@ -36,10 +78,10 @@ const Buttons = () => {
     actions: { increment, decrement }
   } = useContext();
   return (
-    <>
+    <span>
       <button onClick={increment}>+</button>
       <button onClick={decrement}>-</button>
-    </>
+    </span>
   );
 };
 
@@ -47,12 +89,12 @@ const Display = () => {
   const {
     state: { count }
   } = useContext();
-  return <>{count}</>;
+  return <span>{count}</span>;
 };
 
 const CounterApp = () => {
   return (
-    <Provider>
+    <Provider value={{ count: 0 }}>
       <Buttons />
       <Display />
     </Provider>
