@@ -25,28 +25,27 @@ const IGNORES: string[] = extract({}, []);
 export function createTinyContext<S, A extends Actions<S, A>>(internalActions: InternalActions<S, A>) {
   const Context = createContext<{ state: S; actions: A }>({} as any);
 
-  const queue: TaskQueue<S>[] = [];
-  let busy = false;
-
   const Provider = ({ value, children }: { value: S; children: React.ReactNode }) => {
     const [state, setState] = useState<S>(value);
     const [count, setCount] = useState(0);
     const wake = () => setCount(c => c + 1);
 
+    const c = useMemo<{ queue: TaskQueue<S>[]; busy: boolean }>(() => ({ queue: [], busy: false }), []);
+
     useEffect(() => {
-      if (busy) return;
-      busy = true;
-      const next = queue.shift();
+      if (c.busy) return;
+      c.busy = true;
+      const next = c.queue.shift();
       if (next) {
         next({ ...state })
           .then(next.resolve)
           .catch(next.reject)
           .finally(() => {
-            busy = false;
+            c.busy = false;
             wake();
           });
       } else {
-        busy = false;
+        c.busy = false;
       }
     }, [count]);
 
@@ -63,7 +62,7 @@ export function createTinyContext<S, A extends Actions<S, A>>(internalActions: I
         };
         task.resolve = resolve;
         task.reject = reject;
-        queue.push(task);
+        c.queue.push(task);
         wake();
       });
 
