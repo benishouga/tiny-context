@@ -22,34 +22,43 @@ const extract = (obj: object, ignores = IGNORES) => {
 
 const IGNORES: string[] = extract({}, []);
 
+const useRerender = () => {
+  const [_, set] = useState(0);
+  return { rerender: () => set(c => c + 1) };
+};
+
 export function createTinyContext<S, A extends Actions<S, A>>(internalActions: InternalActions<S, A>) {
   const Context = createContext<{ state: S; actions: A }>({} as any);
 
   const Provider = ({ value, children }: { value: S; children: React.ReactNode }) => {
-    const [state, setState] = useState<S>(value);
-    const [count, setCount] = useState(0);
-    const wake = () => setCount(c => c + 1);
+    const { rerender } = useRerender();
 
-    const c = useMemo<{ queue: TaskQueue<S>[]; busy: boolean }>(() => ({ queue: [], busy: false }), []);
-
-    useEffect(() => {
-      if (c.busy) return;
-      c.busy = true;
-      const next = c.queue.shift();
-      if (next) {
-        next({ ...state })
-          .then(next.resolve)
-          .catch(next.reject)
-          .finally(() => {
-            c.busy = false;
-            wake();
-          });
-      } else {
-        c.busy = false;
-      }
-    }, [count]);
+    const c = useMemo<{ state: S; queue: TaskQueue<S>[]; busy: boolean }>(
+      () => ({ state: value, queue: [], busy: false }),
+      []
+    );
 
     return useMemo(() => {
+      const seek = () => {
+        if (c.busy) return;
+        c.busy = true;
+        const next = c.queue.shift();
+        if (next) {
+          next({ ...c.state })
+            .then(next.resolve)
+            .catch(next.reject)
+            .finally(() => {
+              rerender();
+              c.busy = false;
+
+              seek();
+            });
+        } else {
+          rerender();
+          c.busy = false;
+        }
+      };
+
       const convertAction = (
         actions: InternalActions<S, A>,
         action: (state: S, ...args: any) => Promise<void> | Promise<S>
@@ -58,13 +67,14 @@ export function createTinyContext<S, A extends Actions<S, A>>(internalActions: I
           const task = async (state: S) => {
             const newState = await action.bind(actions)(state, ...args);
             if (newState !== null && newState !== undefined) {
-              setState({ ...newState });
+              c.state = { ...newState };
             }
           };
           task.resolve = resolve;
           task.reject = reject;
           c.queue.push(task);
-          wake();
+
+          seek();
         });
 
       const convert = (actions: InternalActions<S, A>) => {
@@ -73,8 +83,11 @@ export function createTinyContext<S, A extends Actions<S, A>>(internalActions: I
         extract(internal).forEach(name => (external[name] = convertAction(actions, internal[name])));
         return external as A;
       };
-      return <Context.Provider value={{ state, actions: convert(internalActions) }}>{children}</Context.Provider>;
-    }, [state]);
+
+      return (
+        <Context.Provider value={{ state: c.state, actions: convert(internalActions) }}>{children}</Context.Provider>
+      );
+    }, [c.state]);
   };
 
   return { Provider, useContext: () => useContext(Context) };
