@@ -2,7 +2,6 @@ import React, { createContext, useContext, useState, useMemo } from 'react';
 
 type Action<S> = (...args: any) => Promise<void> | Promise<S>;
 type Actions<S, A> = { [P in keyof A]: Action<S> };
-type TaskQueue<S> = ((s: S) => Promise<void>) & { resolve: () => void; reject: () => void };
 
 export type InternalActions<S, A extends Actions<S, A>> = {
   [P in keyof A]: (state: S, ...args: Parameters<A[P]>) => void | S | Promise<void> | Promise<S>;
@@ -27,35 +26,35 @@ const useRerender = () => {
   return { rerender: () => set(c => c + 1) };
 };
 
+class Queue {
+  private q: (() => Promise<void>)[] = [];
+
+  push(task: () => Promise<void>) {
+    const free = !this.q.length;
+    this.q.push(task);
+    if (free) this.awake();
+  }
+
+  awake() {
+    const next = this.q[0];
+    if (next) {
+      next().finally(() => {
+        this.q.shift();
+        this.awake();
+      });
+    }
+  }
+}
+
 export function createTinyContext<S, A extends Actions<S, A>>(internalActions: InternalActions<S, A>) {
   const Context = createContext<{ state: S; actions: A }>({} as any);
 
   const Provider = ({ value, children }: { value: S; children: React.ReactNode }) => {
     const { rerender } = useRerender();
 
-    const c = useMemo<{ state: S; queue: TaskQueue<S>[]; busy: boolean }>(
-      () => ({ state: value, queue: [], busy: false }),
-      []
-    );
+    const c = useMemo<{ state: S; queue: Queue }>(() => ({ state: value, queue: new Queue() }), []);
 
     return useMemo(() => {
-      const seek = () => {
-        if (c.busy) return;
-        c.busy = true;
-        const next = c.queue.shift();
-        if (next) {
-          next({ ...c.state })
-            .then(next.resolve)
-            .catch(next.reject)
-            .finally(() => {
-              c.busy = false;
-              seek();
-            });
-        } else {
-          c.busy = false;
-        }
-      };
-
       const convertAction = (
         actions: InternalActions<S, A>,
         action: (state: S, ...args: any) => Promise<void> | Promise<S>
@@ -68,11 +67,11 @@ export function createTinyContext<S, A extends Actions<S, A>>(internalActions: I
               rerender();
             }
           };
-          task.resolve = resolve;
-          task.reject = reject;
-          c.queue.push(task);
-
-          seek();
+          c.queue.push(async () => {
+            task(c.state)
+              .then(resolve)
+              .catch(reject);
+          });
         });
 
       const convert = (actions: InternalActions<S, A>) => {
