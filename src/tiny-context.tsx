@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useMemo } from 'react';
 
 type Action<S> = (...args: any) => Promise<void> | Promise<S>;
 type Actions<S, A> = { [P in keyof A]: Action<S> };
@@ -48,13 +48,10 @@ export function createTinyContext<S, A extends Actions<S, A>>(internalActions: I
             .then(next.resolve)
             .catch(next.reject)
             .finally(() => {
-              rerender();
               c.busy = false;
-
               seek();
             });
         } else {
-          rerender();
           c.busy = false;
         }
       };
@@ -68,6 +65,7 @@ export function createTinyContext<S, A extends Actions<S, A>>(internalActions: I
             const newState = await action.bind(actions)(state, ...args);
             if (newState !== null && newState !== undefined) {
               c.state = { ...newState };
+              rerender();
             }
           };
           task.resolve = resolve;
