@@ -4,7 +4,7 @@ declare type Actions<S, A> = {
     [P in keyof A]: Action<S>;
 };
 export declare type InternalActions<S, A extends Actions<S, A>> = {
-    [P in keyof A]: (state: S, ...args: Parameters<A[P]>) => void | S | Promise<void> | Promise<S>;
+    [P in keyof A]: (state: Readonly<S>, ...args: Parameters<A[P]>) => void | Readonly<S> | Promise<void> | Promise<Readonly<S>>;
 };
 export declare function createTinyContext<S, A extends Actions<S, A>>(internalActions: InternalActions<S, A>): {
     Provider: ({ value, children }: {

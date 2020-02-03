@@ -52,7 +52,7 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
             r[k] = a[j];
     return r;
 };
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useMemo } from 'react';
 var extract = function (obj, ignores) {
     if (ignores === void 0) { ignores = IGNORES; }
     var t = obj;
@@ -66,67 +66,79 @@ var extract = function (obj, ignores) {
     return Array.from(set);
 };
 var IGNORES = extract({}, []);
+var useRerender = function () {
+    var _a = useState(0), _ = _a[0], set = _a[1];
+    return { rerender: function () { return set(function (c) { return c + 1; }); } };
+};
+var Queue = /** @class */ (function () {
+    function Queue() {
+        this.q = [];
+    }
+    Queue.prototype.push = function (task) {
+        var free = !this.q.length;
+        this.q.push(task);
+        if (free)
+            this.awake();
+    };
+    Queue.prototype.awake = function () {
+        var _this = this;
+        var next = this.q[0];
+        if (next) {
+            next().finally(function () {
+                _this.q.shift();
+                _this.awake();
+            });
+        }
+    };
+    return Queue;
+}());
 export function createTinyContext(internalActions) {
     var _this = this;
     var Context = createContext({});
-    var queue = [];
-    var busy = false;
     var Provider = function (_a) {
         var value = _a.value, children = _a.children;
-        var _b = useState(value), state = _b[0], setState = _b[1];
-        var _c = useState(0), count = _c[0], setCount = _c[1];
-        var wake = function () { return setCount(function (c) { return c + 1; }); };
-        useEffect(function () {
-            if (busy)
-                return;
-            busy = true;
-            var next = queue.shift();
-            if (next) {
-                next(__assign({}, state))
-                    .then(next.resolve)
-                    .catch(next.reject)
-                    .finally(function () {
-                    busy = false;
-                    wake();
+        var rerender = useRerender().rerender;
+        var c = useMemo(function () { return ({ state: value, queue: new Queue() }); }, []);
+        return useMemo(function () {
+            var convertAction = function (actions, action) { return function () {
+                var args = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    args[_i] = arguments[_i];
+                }
+                return new Promise(function (resolve, reject) {
+                    var task = function (state) { return __awaiter(_this, void 0, void 0, function () {
+                        var newState;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0: return [4 /*yield*/, action.bind(actions).apply(void 0, __spreadArrays([state], args))];
+                                case 1:
+                                    newState = _a.sent();
+                                    if (newState !== null && newState !== undefined) {
+                                        c.state = __assign({}, newState);
+                                        rerender();
+                                    }
+                                    return [2 /*return*/];
+                            }
+                        });
+                    }); };
+                    c.queue.push(function () { return __awaiter(_this, void 0, void 0, function () {
+                        return __generator(this, function (_a) {
+                            task(c.state)
+                                .then(resolve)
+                                .catch(reject);
+                            return [2 /*return*/];
+                        });
+                    }); });
                 });
-            }
-            else {
-                busy = false;
-            }
-        }, [count]);
-        var convertAction = function (actions, action) { return function () {
-            var args = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                args[_i] = arguments[_i];
-            }
-            return new Promise(function (resolve, reject) {
-                var task = function (state) { return __awaiter(_this, void 0, void 0, function () {
-                    var newState;
-                    return __generator(this, function (_a) {
-                        switch (_a.label) {
-                            case 0: return [4 /*yield*/, action.bind(actions).apply(void 0, __spreadArrays([state], args))];
-                            case 1:
-                                newState = _a.sent();
-                                if (newState !== null && newState !== undefined) {
-                                    setState(__assign({}, newState));
-                                }
-                                return [2 /*return*/];
-                        }
-                    });
-                }); };
-                task.resolve = resolve;
-                task.reject = reject;
-                queue.push(task);
-                wake();
-            });
-        }; };
-        var convert = function (actions) {
-            var internal = actions;
-            var external = {};
-            extract(internal).forEach(function (name) { return (external[name] = convertAction(actions, internal[name])); });
-            return external;
-        };
-        return useMemo(function () { return React.createElement(Context.Provider, { value: { state: state, actions: convert(internalActions) } }, children); }, [state]);
+            }; };
+            var convert = function (actions) {
+                var internal = actions;
+                var external = {};
+                extract(internal).forEach(function (name) { return (external[name] = convertAction(actions, internal[name])); });
+                return external;
+            };
+            return (React.createElement(Context.Provider, { value: { state: c.state, actions: convert(internalActions) } }, children));
+        }, [c.state]);
     };
     return { Provider: Provider, useContext: function () { return useContext(Context); } };
 }
