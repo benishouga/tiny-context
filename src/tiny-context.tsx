@@ -55,7 +55,7 @@ export function createTinyContext<S, A extends Actions<S, A>>(internalActions: I
   const Provider = ({ value, children }: { value: S; children: React.ReactNode }) => {
     const { rerender } = useRerender();
 
-    const c = useMemo<{ state: S; queue: Queue }>(() => ({ state: value, queue: new Queue() }), []);
+    const memo = useMemo<{ state: S; queue: Queue }>(() => ({ state: value, queue: new Queue() }), []);
 
     return useMemo(() => {
       const convertAction = (
@@ -66,12 +66,12 @@ export function createTinyContext<S, A extends Actions<S, A>>(internalActions: I
           const task = async (state: S) => {
             const newState = await action.bind(actions)(state, ...args);
             if (newState !== null && newState !== undefined) {
-              c.state = { ...newState };
+              memo.state = { ...newState };
               rerender();
             }
           };
-          c.queue.push(async () => {
-            task(c.state)
+          memo.queue.push(async () => {
+            task(memo.state)
               .then(resolve)
               .catch(reject);
           });
@@ -85,9 +85,9 @@ export function createTinyContext<S, A extends Actions<S, A>>(internalActions: I
       };
 
       return (
-        <Context.Provider value={{ state: c.state, actions: convert(internalActions) }}>{children}</Context.Provider>
+        <Context.Provider value={{ state: memo.state, actions: convert(internalActions) }}>{children}</Context.Provider>
       );
-    }, [c.state]);
+    }, [memo.state]);
   };
 
   return { Provider, useContext: () => useContext(Context) };
