@@ -62,15 +62,15 @@ export function createTinyContext<S, A extends Actions<A>>(internalActions: Inte
         action: (state: S, ...args: any) => InternalActionResult<S>
       ) => (...args: any) =>
         new Promise<void>((resolve, reject) => {
-          const task = async (state: S) => {
-            const newState = await action.bind(actions)(state, ...args);
+          const task = async () => {
+            const newState = await action.bind(actions)(memo.state, ...args);
             if (newState !== null && newState !== undefined) {
               memo.state = { ...newState };
               rerender();
             }
           };
           memo.queue.push(async () => {
-            task(memo.state)
+            task()
               .then(resolve)
               .catch(reject);
           });
