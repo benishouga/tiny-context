@@ -1,13 +1,13 @@
+import '@testing-library/jest-dom/extend-expect';
 import React from 'react';
-
-import { render, fireEvent, screen, wait } from '@testing-library/react';
+import { render, fireEvent, screen, wait, waitForElement } from '@testing-library/react';
 
 import { createTinyContext, InternalActions } from '../src/tiny-context';
 
 describe('tiny-context', () => {
   describe('simple actions', () => {
     type State = { count: number };
-    type Actions = { increment: () => Promise<void>; doNothing: () => Promise<void> };
+    type Actions = { increment: () => void; doNothing: () => void };
     const { Provider, useContext } = createTinyContext<State, Actions>({
       increment: state => ({ count: state.count + 1 }),
       doNothing: () => {}
@@ -48,8 +48,8 @@ describe('tiny-context', () => {
 
     test('createTinyContext can create a Provider and useContext instance.', () => {
       const { Provider, useContext } = createTinyContext<{}, {}>({});
-      expect(Provider).toBeTruthy();
-      expect(useContext).toBeTruthy();
+      expect(Provider).toBeDefined();
+      expect(useContext).toBeDefined();
     });
 
     test('Update the State using an action.', async () => {
@@ -59,10 +59,10 @@ describe('tiny-context', () => {
           <Display />
         </Provider>
       );
-      expect(screen.getByText('count is 0')).toBeTruthy();
+      expect(screen.getByText('count is 0')).toBeInTheDocument();
       fireEvent.click(screen.getByText('button'));
-      await wait();
-      expect(screen.getByText('count is 1')).toBeTruthy();
+      await waitForElement(() => screen.getByText('count is 1'));
+      expect(screen.getByText('count is 1')).toBeInTheDocument();
     });
 
     test('Action is executed sequentially when double-clicked.', async () => {
@@ -72,11 +72,11 @@ describe('tiny-context', () => {
           <Display />
         </Provider>
       );
-      expect(screen.getByText('count is 0')).toBeTruthy();
+      expect(screen.getByText('count is 0')).toBeInTheDocument();
       fireEvent.click(screen.getByText('button'));
       fireEvent.click(screen.getByText('button'));
-      await wait();
-      expect(screen.getByText('count is 2')).toBeTruthy();
+      await waitForElement(() => screen.getByText('count is 2'));
+      expect(screen.getByText('count is 2')).toBeInTheDocument();
     });
 
     test('Action is executed sequentially when the action is called twice on the same event loop.', async () => {
@@ -86,10 +86,10 @@ describe('tiny-context', () => {
           <Display />
         </Provider>
       );
-      expect(screen.getByText('count is 0')).toBeTruthy();
+      expect(screen.getByText('count is 0')).toBeInTheDocument();
       fireEvent.click(screen.getByText('button'));
-      await wait();
-      expect(screen.getByText('count is 2')).toBeTruthy();
+      await waitForElement(() => screen.getByText('count is 2'));
+      expect(screen.getByText('count is 2')).toBeInTheDocument();
     });
 
     test('If the Action does not return anything, it does not update the state.', async () => {
@@ -99,12 +99,13 @@ describe('tiny-context', () => {
           <Display />
         </Provider>
       );
-      expect(screen.getByText('count is 0')).toBeTruthy();
+      expect(screen.getByText('count is 0')).toBeInTheDocument();
       fireEvent.click(screen.getByText('button'));
       await wait();
-      expect(screen.getByText('count is 0')).toBeTruthy();
+      expect(screen.getByText('count is 0')).toBeInTheDocument();
     });
   });
+
   describe('class based actions', () => {
     type State = { count: number };
     type Actions = {
@@ -181,10 +182,10 @@ describe('tiny-context', () => {
           <Display />
         </Provider>
       );
-      expect(screen.getByText('count is 0')).toBeTruthy();
+      expect(screen.getByText('count is 0')).toBeInTheDocument();
       fireEvent.click(screen.getByText('button'));
       await wait();
-      expect(screen.getByText('count is 1')).toBeTruthy();
+      expect(screen.getByText('count is 1')).toBeInTheDocument();
     });
 
     test('Can create asynchronous actions.', async () => {
@@ -194,10 +195,10 @@ describe('tiny-context', () => {
           <Display />
         </Provider>
       );
-      expect(screen.getByText('count is 0')).toBeTruthy();
+      expect(screen.getByText('count is 0')).toBeInTheDocument();
       fireEvent.click(screen.getByText('button'));
       await wait();
-      expect(screen.getByText('count is 1')).toBeTruthy();
+      expect(screen.getByText('count is 1')).toBeInTheDocument();
     });
 
     test('Can refer to This in Action.', async () => {
@@ -207,10 +208,10 @@ describe('tiny-context', () => {
           <Display />
         </Provider>
       );
-      expect(screen.getByText('count is 0')).toBeTruthy();
+      expect(screen.getByText('count is 0')).toBeInTheDocument();
       fireEvent.click(screen.getByText('button'));
       await wait();
-      expect(screen.getByText('count is 1')).toBeTruthy();
+      expect(screen.getByText('count is 1')).toBeInTheDocument();
     });
 
     test('Handle exceptions.', async () => {
@@ -220,10 +221,65 @@ describe('tiny-context', () => {
           <Display />
         </Provider>
       );
-      expect(screen.getByText('count is 0')).toBeTruthy();
+      expect(screen.getByText('count is 0')).toBeInTheDocument();
       fireEvent.click(screen.getByText('button'));
       await wait();
-      expect(screen.getByText('count is 1')).toBeTruthy();
+      expect(screen.getByText('count is 1')).toBeInTheDocument();
+    });
+  });
+  describe('async actions', () => {
+    type State = { count: number };
+    type Actions = { increment: () => void };
+    const { Provider, useContext } = createTinyContext<State, Actions>({
+      increment: async state => {
+        await new Promise(resolve => setTimeout(resolve)); // wait for event loop
+        return { count: state.count + 1 };
+      }
+    });
+    const IncrementButton = () => {
+      const {
+        actions: { increment }
+      } = useContext();
+      return <button onClick={increment}>button</button>;
+    };
+    const Display = () => {
+      const {
+        state: { count }
+      } = useContext();
+      return <>count is {count}</>;
+    };
+
+    test('createTinyContext can create a Provider and useContext instance.', () => {
+      const { Provider, useContext } = createTinyContext<{}, {}>({});
+      expect(Provider).toBeDefined();
+      expect(useContext).toBeDefined();
+    });
+
+    test('Async action works.', async () => {
+      render(
+        <Provider value={{ count: 0 }}>
+          <IncrementButton />
+          <Display />
+        </Provider>
+      );
+      expect(screen.getByText('count is 0')).toBeInTheDocument();
+      fireEvent.click(screen.getByText('button'));
+      await waitForElement(() => screen.getByText('count is 1'));
+      expect(screen.getByText('count is 1')).toBeInTheDocument();
+    });
+
+    test('Async action is executed sequentially.', async () => {
+      render(
+        <Provider value={{ count: 0 }}>
+          <IncrementButton />
+          <Display />
+        </Provider>
+      );
+      expect(screen.getByText('count is 0')).toBeInTheDocument();
+      fireEvent.click(screen.getByText('button'));
+      fireEvent.click(screen.getByText('button'));
+      await waitForElement(() => screen.getByText('count is 2'));
+      expect(screen.getByText('count is 2')).toBeInTheDocument();
     });
   });
 });

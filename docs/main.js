@@ -32297,35 +32297,39 @@ function createTinyContext(internalActions) {
     var Provider = function (_a) {
         var value = _a.value, children = _a.children;
         var rerender = useRerender().rerender;
-        var c = Object(react__WEBPACK_IMPORTED_MODULE_0__["useMemo"])(function () { return ({ state: value, queue: new Queue() }); }, []);
+        var memo = Object(react__WEBPACK_IMPORTED_MODULE_0__["useMemo"])(function () { return ({ state: value, queue: new Queue() }); }, []);
         return Object(react__WEBPACK_IMPORTED_MODULE_0__["useMemo"])(function () {
             var convertAction = function (actions, action) { return function () {
                 var args = [];
                 for (var _i = 0; _i < arguments.length; _i++) {
                     args[_i] = arguments[_i];
                 }
+                var task = function () { return __awaiter(_this, void 0, void 0, function () {
+                    var newState;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0: return [4 /*yield*/, action.bind(actions).apply(void 0, __spreadArrays([memo.state], args))];
+                            case 1:
+                                newState = _a.sent();
+                                if (newState !== null && newState !== undefined) {
+                                    memo.state = __assign({}, newState);
+                                    rerender();
+                                }
+                                return [2 /*return*/];
+                        }
+                    });
+                }); };
                 return new Promise(function (resolve, reject) {
-                    var task = function (state) { return __awaiter(_this, void 0, void 0, function () {
-                        var newState;
+                    memo.queue.push(function () { return __awaiter(_this, void 0, void 0, function () {
                         return __generator(this, function (_a) {
                             switch (_a.label) {
-                                case 0: return [4 /*yield*/, action.bind(actions).apply(void 0, __spreadArrays([state], args))];
+                                case 0: return [4 /*yield*/, task()
+                                        .then(resolve)
+                                        .catch(reject)];
                                 case 1:
-                                    newState = _a.sent();
-                                    if (newState !== null && newState !== undefined) {
-                                        c.state = __assign({}, newState);
-                                        rerender();
-                                    }
+                                    _a.sent();
                                     return [2 /*return*/];
                             }
-                        });
-                    }); };
-                    c.queue.push(function () { return __awaiter(_this, void 0, void 0, function () {
-                        return __generator(this, function (_a) {
-                            task(c.state)
-                                .then(resolve)
-                                .catch(reject);
-                            return [2 /*return*/];
                         });
                     }); });
                 });
@@ -32336,8 +32340,8 @@ function createTinyContext(internalActions) {
                 extract(internal).forEach(function (name) { return (external[name] = convertAction(actions, internal[name])); });
                 return external;
             };
-            return (react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Context.Provider, { value: { state: c.state, actions: convert(internalActions) } }, children));
-        }, [c.state]);
+            return (react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Context.Provider, { value: { state: memo.state, actions: convert(internalActions) } }, children));
+        }, [memo.state]);
     };
     return { Provider: Provider, useContext: function () { return Object(react__WEBPACK_IMPORTED_MODULE_0__["useContext"])(Context); } };
 }
