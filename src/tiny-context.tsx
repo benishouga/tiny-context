@@ -1,13 +1,12 @@
 import React, { createContext, useContext, useState, useMemo } from 'react';
 
-type Action<S> = (...args: any) => Promise<void> | Promise<S>;
-type Actions<S, A> = { [P in keyof A]: Action<S> };
+type Action = (...args: any) => void | Promise<void>;
+type Actions<A> = { [P in keyof A]: Action };
 
-export type InternalActions<S, A extends Actions<S, A>> = {
-  [P in keyof A]: (
-    state: Readonly<S>,
-    ...args: Parameters<A[P]>
-  ) => void | Readonly<S> | Promise<void> | Promise<Readonly<S>>;
+type InternalActionResult<S> = void | Readonly<S> | Promise<void> | Promise<Readonly<S>>;
+
+export type InternalActions<S, A extends Actions<A>> = {
+  [P in keyof A]: (state: Readonly<S>, ...args: Parameters<A[P]>) => InternalActionResult<S>;
 };
 
 const extract = (obj: object, ignores = IGNORES) => {
@@ -49,7 +48,7 @@ class Queue {
   }
 }
 
-export function createTinyContext<S, A extends Actions<S, A>>(internalActions: InternalActions<S, A>) {
+export function createTinyContext<S, A extends Actions<A>>(internalActions: InternalActions<S, A>) {
   const Context = createContext<{ state: S; actions: A }>({} as any);
 
   const Provider = ({ value, children }: { value: S; children: React.ReactNode }) => {
@@ -60,7 +59,7 @@ export function createTinyContext<S, A extends Actions<S, A>>(internalActions: I
     return useMemo(() => {
       const convertAction = (
         actions: InternalActions<S, A>,
-        action: (state: S, ...args: any) => Promise<void> | Promise<S>
+        action: (state: S, ...args: any) => InternalActionResult<S>
       ) => (...args: any) =>
         new Promise<void>((resolve, reject) => {
           const task = async (state: S) => {
@@ -78,8 +77,8 @@ export function createTinyContext<S, A extends Actions<S, A>>(internalActions: I
         });
 
       const convert = (actions: InternalActions<S, A>) => {
-        const internal: { [name: string]: (state: S, ...args: any) => Promise<void> | Promise<S> } = actions as any;
-        const external: { [name: string]: (...args: any) => Promise<void> } = {};
+        const internal: { [name: string]: (state: S, ...args: any) => InternalActionResult<S> } = actions as any;
+        const external: { [name: string]: (...args: any) => void | Promise<void> } = {};
         extract(internal).forEach(name => (external[name] = convertAction(actions, internal[name])));
         return external as A;
       };
