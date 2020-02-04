@@ -2,8 +2,7 @@
 
 ![GITHUB-BADGE](https://github.com/benishouga/tiny-context/workflows/Node.js%20CI/badge.svg)
 
-This library for Context API of React Hooks. Easily create a context with a state and an action to update it.<br>
-**EXPERIMENTAL** This library is an experimental implementation, so performance is likely to be sacrificed.
+This library for Context API of React Hooks. Easily create a context with a state and an action to update it.
 
 ## Installation
 
