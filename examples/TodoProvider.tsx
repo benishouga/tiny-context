@@ -12,8 +12,8 @@ export interface TodoState {
 }
 
 export interface TodoActions {
-  showProgress: () => Promise<void>;
-  hideProgress: () => Promise<void>;
+  showProgress: () => void;
+  hideProgress: () => void;
   add: (todo: Todo) => Promise<void>;
   update: (index: number, todo: Todo) => Promise<void>;
 }
@@ -21,12 +21,23 @@ export interface TodoActions {
 const { Provider, useContext } = createTinyContext<TodoState, TodoActions>({
   showProgress: state => ({ ...state, progress: true }),
   hideProgress: state => ({ ...state, progress: false }),
-  add: async (state, todo) => {
-    await new Promise(resolve => setTimeout(resolve, 500)); // network
-    const todos = [...state.todos, todo];
-    return { ...state, todos };
+  add: function*(state, todo) {
+    state.progress = true;
+    yield state;
+
+    yield new Promise<TodoState>(resolve =>
+      setTimeout(() => {
+        const todos = [...state.todos, todo];
+        state.todos = todos;
+        resolve(state);
+      }, 500)
+    );
+
+    state.progress = false;
+    return state;
   },
   update: async (state, index, todo) => {
+    await new Promise<TodoState>(resolve => setTimeout(resolve, 500));
     const todos = [...state.todos];
     todos[index] = todo;
     return { ...state, todos };

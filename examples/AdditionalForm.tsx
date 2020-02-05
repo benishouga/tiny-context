@@ -4,7 +4,7 @@ import { useTodoContext } from './TodoProvider';
 export const AdditionalForm = () => {
   const {
     state: { progress },
-    actions: { add, showProgress, hideProgress }
+    actions: { add }
   } = useTodoContext();
 
   const [text, setText] = useState('');
@@ -13,9 +13,7 @@ export const AdditionalForm = () => {
     if (!text) {
       return;
     }
-    await showProgress();
     await add({ text, completed: false });
-    await hideProgress();
     setText('');
   };
 

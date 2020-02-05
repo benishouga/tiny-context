@@ -3,11 +3,16 @@ import React, { createContext, useContext, useState, useMemo } from 'react';
 type Action = (...args: any) => void | Promise<void>;
 type Actions<A> = { [P in keyof A]: Action };
 
-type InternalActionResult<S> = void | Readonly<S> | Promise<void> | Promise<Readonly<S>>;
+type InternalActionResult<S> = ActionResult<S> | Iterator<ActionResult<S>, ActionResult<S>>;
+type ActionResult<S> = void | S | Promise<void> | Promise<S>;
 
 export type InternalActions<S, A extends Actions<A>> = {
-  [P in keyof A]: (state: Readonly<S>, ...args: Parameters<A[P]>) => InternalActionResult<S>;
+  [P in keyof A]: (state: S, ...args: Parameters<A[P]>) => InternalActionResult<S>;
 };
+
+function isIterator<S>(obj: any): obj is Iterator<S, S> {
+  return obj && typeof obj.next === 'function' && typeof obj.throw === 'function' && typeof obj.return === 'function';
+}
 
 const extract = (obj: object, ignores = IGNORES) => {
   let t = obj;
@@ -59,10 +64,24 @@ export function createTinyContext<S, A extends Actions<A>>(actions: InternalActi
     return useMemo(() => {
       const convertAction = (action: (state: S, ...args: any) => InternalActionResult<S>) => (...args: any) => {
         const task = async () => {
-          const newState = await action.bind(actions)(memo.state, ...args);
-          if (newState !== null && newState !== undefined) {
-            memo.state = { ...newState };
-            rerender();
+          const actionResult = await action.bind(actions)(memo.state, ...args);
+          if (isIterator<ActionResult<S>>(actionResult)) {
+            while (true) {
+              const result = actionResult.next();
+              const newState = await result.value;
+              if (newState !== null && newState !== undefined) {
+                memo.state = { ...newState };
+                rerender();
+              }
+              if (result.done) break;
+            }
+            return;
+          } else {
+            const newState = actionResult;
+            if (newState !== null && newState !== undefined) {
+              memo.state = { ...newState };
+              rerender();
+            }
           }
         };
 
