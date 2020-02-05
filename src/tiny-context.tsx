@@ -48,7 +48,7 @@ class Queue {
   }
 }
 
-export function createTinyContext<S, A extends Actions<A>>(internalActions: InternalActions<S, A>) {
+export function createTinyContext<S, A extends Actions<A>>(actions: InternalActions<S, A>) {
   const Context = createContext<{ state: S; actions: A }>({} as any);
 
   const Provider = ({ value, children }: { value: S; children: React.ReactNode }) => {
@@ -57,10 +57,7 @@ export function createTinyContext<S, A extends Actions<A>>(internalActions: Inte
     const memo = useMemo<{ state: S; queue: Queue }>(() => ({ state: value, queue: new Queue() }), []);
 
     return useMemo(() => {
-      const convertAction = (
-        actions: InternalActions<S, A>,
-        action: (state: S, ...args: any) => InternalActionResult<S>
-      ) => (...args: any) => {
+      const convertAction = (action: (state: S, ...args: any) => InternalActionResult<S>) => (...args: any) => {
         const task = async () => {
           const newState = await action.bind(actions)(memo.state, ...args);
           if (newState !== null && newState !== undefined) {
@@ -79,15 +76,12 @@ export function createTinyContext<S, A extends Actions<A>>(internalActions: Inte
       };
 
       const convert = (actions: InternalActions<S, A>) => {
-        const internal: { [name: string]: (state: S, ...args: any) => InternalActionResult<S> } = actions as any;
         const external: { [name: string]: (...args: any) => void | Promise<void> } = {};
-        extract(internal).forEach(name => (external[name] = convertAction(actions, internal[name])));
+        extract(actions).forEach(name => (external[name] = convertAction((actions as any)[name])));
         return external as A;
       };
 
-      return (
-        <Context.Provider value={{ state: memo.state, actions: convert(internalActions) }}>{children}</Context.Provider>
-      );
+      return <Context.Provider value={{ state: memo.state, actions: convert(actions) }}>{children}</Context.Provider>;
     }, [memo.state]);
   };
 
