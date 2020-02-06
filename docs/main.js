@@ -138,8 +138,8 @@ var __generator = (undefined && undefined.__generator) || function (thisArg, bod
 
 
 var AdditionalForm = function () {
-    var _a = Object(_TodoProvider__WEBPACK_IMPORTED_MODULE_1__["useTodoContext"])(), progress = _a.state.progress, _b = _a.actions, add = _b.add, showProgress = _b.showProgress, hideProgress = _b.hideProgress;
-    var _c = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])(''), text = _c[0], setText = _c[1];
+    var _a = Object(_TodoProvider__WEBPACK_IMPORTED_MODULE_1__["useTodoContext"])(), progress = _a.state.progress, add = _a.actions.add;
+    var _b = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])(''), text = _b[0], setText = _b[1];
     var onAddClick = function () { return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -147,14 +147,8 @@ var AdditionalForm = function () {
                     if (!text) {
                         return [2 /*return*/];
                     }
-                    return [4 /*yield*/, showProgress()];
-                case 1:
-                    _a.sent();
                     return [4 /*yield*/, add({ text: text, completed: false })];
-                case 2:
-                    _a.sent();
-                    return [4 /*yield*/, hideProgress()];
-                case 3:
+                case 1:
                     _a.sent();
                     setText('');
                     return [2 /*return*/];
@@ -222,13 +216,65 @@ var __assign = (undefined && undefined.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
+var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (undefined && undefined.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
 
 
 var TodoList = function () {
-    var _a = Object(_TodoProvider__WEBPACK_IMPORTED_MODULE_1__["useTodoContext"])(), todos = _a.state.todos, update = _a.actions.update;
+    var _a = Object(_TodoProvider__WEBPACK_IMPORTED_MODULE_1__["useTodoContext"])(), todos = _a.state.todos, _b = _a.actions, update = _b.update, showProgress = _b.showProgress, hideProgress = _b.hideProgress;
+    var onCheckd = function (i, todo, checked) { return __awaiter(void 0, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, showProgress()];
+                case 1:
+                    _a.sent();
+                    return [4 /*yield*/, update(i, __assign(__assign({}, todo), { completed: checked }))];
+                case 2:
+                    _a.sent();
+                    return [4 /*yield*/, hideProgress()];
+                case 3:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    }); };
     return (react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("ul", null, todos.map(function (todo, i) { return (react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("li", { key: i },
         react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", { style: { textDecoration: todo.completed ? 'line-through' : '' } }, todo.text),
-        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", { type: "checkbox", checked: todo.completed, onChange: function (e) { return update(i, __assign(__assign({}, todo), { completed: e.target.checked })); } }))); })));
+        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", { type: "checkbox", checked: todo.completed, onChange: function (e) { return onCheckd(i, todo, e.target.checked); } }))); })));
 };
 
 
@@ -307,24 +353,39 @@ var __spreadArrays = (undefined && undefined.__spreadArrays) || function () {
 var _a = Object(_src_tiny_context__WEBPACK_IMPORTED_MODULE_1__["createTinyContext"])({
     showProgress: function (state) { return (__assign(__assign({}, state), { progress: true })); },
     hideProgress: function (state) { return (__assign(__assign({}, state), { progress: false })); },
-    add: function (state, todo) { return __awaiter(void 0, void 0, void 0, function () {
+    add: function (state, todo) {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    state.progress = true;
+                    return [4 /*yield*/, state];
+                case 1:
+                    _a.sent();
+                    return [4 /*yield*/, new Promise(function (resolve) {
+                            return setTimeout(function () {
+                                var todos = __spreadArrays(state.todos, [todo]);
+                                state.todos = todos;
+                                resolve(state);
+                            }, 500);
+                        })];
+                case 2:
+                    _a.sent();
+                    state.progress = false;
+                    return [2 /*return*/, state];
+            }
+        });
+    },
+    update: function (state, index, todo) { return __awaiter(void 0, void 0, void 0, function () {
         var todos;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 500); })];
                 case 1:
-                    _a.sent(); // network
-                    todos = __spreadArrays(state.todos, [todo]);
+                    _a.sent();
+                    todos = __spreadArrays(state.todos);
+                    todos[index] = todo;
                     return [2 /*return*/, __assign(__assign({}, state), { todos: todos })];
             }
-        });
-    }); },
-    update: function (state, index, todo) { return __awaiter(void 0, void 0, void 0, function () {
-        var todos;
-        return __generator(this, function (_a) {
-            todos = __spreadArrays(state.todos);
-            todos[index] = todo;
-            return [2 /*return*/, __assign(__assign({}, state), { todos: todos })];
         });
     }); }
 }), Provider = _a.Provider, useContext = _a.useContext;
@@ -32252,6 +32313,9 @@ var __spreadArrays = (undefined && undefined.__spreadArrays) || function () {
     return r;
 };
 
+function isGenerator(obj) {
+    return obj && typeof obj.next === 'function' && typeof obj.throw === 'function' && typeof obj.return === 'function';
+}
 var extract = function (obj, ignores) {
     if (ignores === void 0) { ignores = IGNORES; }
     var t = obj;
@@ -32291,7 +32355,7 @@ var Queue = /** @class */ (function () {
     };
     return Queue;
 }());
-function createTinyContext(internalActions) {
+function createTinyContext(actions) {
     var _this = this;
     var Context = Object(react__WEBPACK_IMPORTED_MODULE_0__["createContext"])({});
     var Provider = function (_a) {
@@ -32299,23 +32363,42 @@ function createTinyContext(internalActions) {
         var rerender = useRerender().rerender;
         var memo = Object(react__WEBPACK_IMPORTED_MODULE_0__["useMemo"])(function () { return ({ state: value, queue: new Queue() }); }, []);
         return Object(react__WEBPACK_IMPORTED_MODULE_0__["useMemo"])(function () {
-            var convertAction = function (actions, action) { return function () {
+            var feed = function (newState) {
+                if (newState !== null && newState !== undefined) {
+                    memo.state = __assign({}, newState);
+                    rerender();
+                }
+            };
+            var convertAction = function (action) { return function () {
                 var args = [];
                 for (var _i = 0; _i < arguments.length; _i++) {
                     args[_i] = arguments[_i];
                 }
                 var task = function () { return __awaiter(_this, void 0, void 0, function () {
-                    var newState;
-                    return __generator(this, function (_a) {
-                        switch (_a.label) {
+                    var actionResult, result, _a;
+                    return __generator(this, function (_b) {
+                        switch (_b.label) {
                             case 0: return [4 /*yield*/, action.bind(actions).apply(void 0, __spreadArrays([memo.state], args))];
                             case 1:
-                                newState = _a.sent();
-                                if (newState !== null && newState !== undefined) {
-                                    memo.state = __assign({}, newState);
-                                    rerender();
+                                actionResult = _b.sent();
+                                if (!isGenerator(actionResult)) {
+                                    feed(actionResult);
+                                    return [2 /*return*/];
                                 }
-                                return [2 /*return*/];
+                                _b.label = 2;
+                            case 2:
+                                if (false) {}
+                                return [4 /*yield*/, actionResult.next()];
+                            case 3:
+                                result = _b.sent();
+                                _a = feed;
+                                return [4 /*yield*/, result.value];
+                            case 4:
+                                _a.apply(void 0, [_b.sent()]);
+                                if (result.done)
+                                    return [3 /*break*/, 5];
+                                return [3 /*break*/, 2];
+                            case 5: return [2 /*return*/];
                         }
                     });
                 }); };
@@ -32335,12 +32418,11 @@ function createTinyContext(internalActions) {
                 });
             }; };
             var convert = function (actions) {
-                var internal = actions;
                 var external = {};
-                extract(internal).forEach(function (name) { return (external[name] = convertAction(actions, internal[name])); });
+                extract(actions).forEach(function (name) { return (external[name] = convertAction(actions[name])); });
                 return external;
             };
-            return (react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Context.Provider, { value: { state: memo.state, actions: convert(internalActions) } }, children));
+            return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Context.Provider, { value: { state: memo.state, actions: convert(actions) } }, children);
         }, [memo.state]);
     };
     return { Provider: Provider, useContext: function () { return Object(react__WEBPACK_IMPORTED_MODULE_0__["useContext"])(Context); } };

@@ -53,6 +53,9 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
     return r;
 };
 import React, { createContext, useContext, useState, useMemo } from 'react';
+function isGenerator(obj) {
+    return obj && typeof obj.next === 'function' && typeof obj.throw === 'function' && typeof obj.return === 'function';
+}
 var extract = function (obj, ignores) {
     if (ignores === void 0) { ignores = IGNORES; }
     var t = obj;
@@ -92,7 +95,7 @@ var Queue = /** @class */ (function () {
     };
     return Queue;
 }());
-export function createTinyContext(internalActions) {
+export function createTinyContext(actions) {
     var _this = this;
     var Context = createContext({});
     var Provider = function (_a) {
@@ -100,23 +103,42 @@ export function createTinyContext(internalActions) {
         var rerender = useRerender().rerender;
         var memo = useMemo(function () { return ({ state: value, queue: new Queue() }); }, []);
         return useMemo(function () {
-            var convertAction = function (actions, action) { return function () {
+            var feed = function (newState) {
+                if (newState !== null && newState !== undefined) {
+                    memo.state = __assign({}, newState);
+                    rerender();
+                }
+            };
+            var convertAction = function (action) { return function () {
                 var args = [];
                 for (var _i = 0; _i < arguments.length; _i++) {
                     args[_i] = arguments[_i];
                 }
                 var task = function () { return __awaiter(_this, void 0, void 0, function () {
-                    var newState;
-                    return __generator(this, function (_a) {
-                        switch (_a.label) {
+                    var actionResult, result, _a;
+                    return __generator(this, function (_b) {
+                        switch (_b.label) {
                             case 0: return [4 /*yield*/, action.bind(actions).apply(void 0, __spreadArrays([memo.state], args))];
                             case 1:
-                                newState = _a.sent();
-                                if (newState !== null && newState !== undefined) {
-                                    memo.state = __assign({}, newState);
-                                    rerender();
+                                actionResult = _b.sent();
+                                if (!isGenerator(actionResult)) {
+                                    feed(actionResult);
+                                    return [2 /*return*/];
                                 }
-                                return [2 /*return*/];
+                                _b.label = 2;
+                            case 2:
+                                if (!true) return [3 /*break*/, 5];
+                                return [4 /*yield*/, actionResult.next()];
+                            case 3:
+                                result = _b.sent();
+                                _a = feed;
+                                return [4 /*yield*/, result.value];
+                            case 4:
+                                _a.apply(void 0, [_b.sent()]);
+                                if (result.done)
+                                    return [3 /*break*/, 5];
+                                return [3 /*break*/, 2];
+                            case 5: return [2 /*return*/];
                         }
                     });
                 }); };
@@ -136,12 +158,11 @@ export function createTinyContext(internalActions) {
                 });
             }; };
             var convert = function (actions) {
-                var internal = actions;
                 var external = {};
-                extract(internal).forEach(function (name) { return (external[name] = convertAction(actions, internal[name])); });
+                extract(actions).forEach(function (name) { return (external[name] = convertAction(actions[name])); });
                 return external;
             };
-            return (React.createElement(Context.Provider, { value: { state: memo.state, actions: convert(internalActions) } }, children));
+            return React.createElement(Context.Provider, { value: { state: memo.state, actions: convert(actions) } }, children);
         }, [memo.state]);
     };
     return { Provider: Provider, useContext: function () { return useContext(Context); } };

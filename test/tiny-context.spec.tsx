@@ -282,13 +282,13 @@ describe('tiny-context', () => {
     type Actions = { iiincrement: () => void };
     const { Provider, useContext } = createTinyContext<State, Actions>({
       iiincrement: async function*(state) {
-        await new Promise(resolve => setTimeout(resolve));
+        await new Promise(resolve => setTimeout(resolve, 10));
         state.count++;
         yield state;
-        await new Promise(resolve => setTimeout(resolve));
+        await new Promise(resolve => setTimeout(resolve, 10));
         state.count++;
         yield state;
-        await new Promise(resolve => setTimeout(resolve));
+        await new Promise(resolve => setTimeout(resolve, 10));
         state.count++;
         return state;
       }
