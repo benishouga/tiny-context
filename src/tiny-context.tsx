@@ -3,14 +3,17 @@ import React, { createContext, useContext, useState, useMemo } from 'react';
 type Action = (...args: any) => void | Promise<void>;
 type Actions<A> = { [P in keyof A]: Action };
 
-type InternalActionResult<S> = ActionResult<S> | Iterator<ActionResult<S>, ActionResult<S>>;
+type InternalActionResult<S> = ActionResult<S> | GeneratorResult<S>;
 type ActionResult<S> = void | S | Promise<void> | Promise<S>;
+type GeneratorResult<S> =
+  | Generator<ActionResult<S>, ActionResult<S>>
+  | AsyncGenerator<ActionResult<S>, ActionResult<S>>;
 
 export type InternalActions<S, A extends Actions<A>> = {
   [P in keyof A]: (state: S, ...args: Parameters<A[P]>) => InternalActionResult<S>;
 };
 
-function isIterator<S>(obj: any): obj is Iterator<S, S> {
+function isGenerator<S>(obj: any): obj is GeneratorResult<S> {
   return obj && typeof obj.next === 'function' && typeof obj.throw === 'function' && typeof obj.return === 'function';
 }
 
@@ -62,26 +65,24 @@ export function createTinyContext<S, A extends Actions<A>>(actions: InternalActi
     const memo = useMemo<{ state: S; queue: Queue }>(() => ({ state: value, queue: new Queue() }), []);
 
     return useMemo(() => {
+      const feed = (newState: void | S) => {
+        if (newState !== null && newState !== undefined) {
+          memo.state = { ...newState };
+          rerender();
+        }
+      };
+
       const convertAction = (action: (state: S, ...args: any) => InternalActionResult<S>) => (...args: any) => {
         const task = async () => {
           const actionResult = await action.bind(actions)(memo.state, ...args);
-          if (isIterator<ActionResult<S>>(actionResult)) {
-            while (true) {
-              const result = actionResult.next();
-              const newState = await result.value;
-              if (newState !== null && newState !== undefined) {
-                memo.state = { ...newState };
-                rerender();
-              }
-              if (result.done) break;
-            }
+          if (!isGenerator<ActionResult<S>>(actionResult)) {
+            feed(actionResult);
             return;
-          } else {
-            const newState = actionResult;
-            if (newState !== null && newState !== undefined) {
-              memo.state = { ...newState };
-              rerender();
-            }
+          }
+          while (true) {
+            const result = await actionResult.next();
+            feed(await result.value);
+            if (result.done) break;
           }
         };
 

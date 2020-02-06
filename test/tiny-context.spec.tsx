@@ -249,12 +249,6 @@ describe('tiny-context', () => {
       return <>count is {count}</>;
     };
 
-    test('createTinyContext can create a Provider and useContext instance.', () => {
-      const { Provider, useContext } = createTinyContext<{}, {}>({});
-      expect(Provider).toBeDefined();
-      expect(useContext).toBeDefined();
-    });
-
     test('Async action works.', async () => {
       render(
         <Provider value={{ count: 0 }}>
@@ -280,6 +274,53 @@ describe('tiny-context', () => {
       fireEvent.click(screen.getByText('button'));
       await waitForElement(() => screen.getByText('count is 2'));
       expect(screen.getByText('count is 2')).toBeInTheDocument();
+    });
+  });
+
+  describe('generator actions', () => {
+    type State = { count: number };
+    type Actions = { iiincrement: () => void };
+    const { Provider, useContext } = createTinyContext<State, Actions>({
+      iiincrement: async function*(state) {
+        await new Promise(resolve => setTimeout(resolve));
+        state.count++;
+        yield state;
+        await new Promise(resolve => setTimeout(resolve));
+        state.count++;
+        yield state;
+        await new Promise(resolve => setTimeout(resolve));
+        state.count++;
+        return state;
+      }
+    });
+    const IncrementButton = () => {
+      const {
+        actions: { iiincrement }
+      } = useContext();
+      return <button onClick={iiincrement}>button</button>;
+    };
+    const Display = () => {
+      const {
+        state: { count }
+      } = useContext();
+      return <>count is {count}</>;
+    };
+
+    test('generator action works.', async () => {
+      render(
+        <Provider value={{ count: 0 }}>
+          <IncrementButton />
+          <Display />
+        </Provider>
+      );
+      expect(screen.getByText('count is 0')).toBeInTheDocument();
+      fireEvent.click(screen.getByText('button'));
+      await waitForElement(() => screen.getByText('count is 1'));
+      expect(screen.getByText('count is 1')).toBeInTheDocument();
+      await waitForElement(() => screen.getByText('count is 2'));
+      expect(screen.getByText('count is 2')).toBeInTheDocument();
+      await waitForElement(() => screen.getByText('count is 3'));
+      expect(screen.getByText('count is 3')).toBeInTheDocument();
     });
   });
 });
