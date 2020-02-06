@@ -86,10 +86,370 @@
 /************************************************************************/
 /******/ ({
 
-/***/ "./examples/AdditionalForm.tsx":
+/***/ "./examples/async/AsyncApp.tsx":
 /*!*************************************!*\
-  !*** ./examples/AdditionalForm.tsx ***!
+  !*** ./examples/async/AsyncApp.tsx ***!
   \*************************************/
+/*! exports provided: AsyncApp */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AsyncApp", function() { return AsyncApp; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _wait__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../wait */ "./examples/wait.ts");
+/* harmony import */ var _src_tiny_context__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../src/tiny-context */ "./src/tiny-context.tsx");
+var __assign = (undefined && undefined.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (undefined && undefined.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+
+
+
+var _a = Object(_src_tiny_context__WEBPACK_IMPORTED_MODULE_2__["createTinyContext"])({
+    setLock: function (state, lock) { return (__assign(__assign({}, state), { lock: lock })); },
+    increment: function (state) { return __awaiter(void 0, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, Object(_wait__WEBPACK_IMPORTED_MODULE_1__["wait"])()];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/, __assign(__assign({}, state), { count: state.count + 1 })];
+            }
+        });
+    }); }
+}), Provider = _a.Provider, useContext = _a.useContext;
+var Button = function () {
+    var _a = useContext(), lock = _a.state.lock, _b = _a.actions, setLock = _b.setLock, increment = _b.increment;
+    return (react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", { disabled: lock, onClick: function () { return __awaiter(void 0, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        setLock(true);
+                        return [4 /*yield*/, increment()];
+                    case 1:
+                        _a.sent();
+                        setLock(false);
+                        return [2 /*return*/];
+                }
+            });
+        }); } }, "+"));
+};
+var Display = function () {
+    var count = useContext().state.count;
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, count);
+};
+var AsyncApp = function () { return (react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Provider, { value: { count: 0, lock: false } },
+    "AsyncApp: ",
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Button, null),
+    " ",
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Display, null))); };
+
+
+/***/ }),
+
+/***/ "./examples/class-based/ClassBasedApp.tsx":
+/*!************************************************!*\
+  !*** ./examples/class-based/ClassBasedApp.tsx ***!
+  \************************************************/
+/*! exports provided: ClassBasedApp */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ClassBasedApp", function() { return ClassBasedApp; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _src_tiny_context__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../src/tiny-context */ "./src/tiny-context.tsx");
+var __assign = (undefined && undefined.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+
+
+var ActionsImpl = /** @class */ (function () {
+    function ActionsImpl() {
+    }
+    ActionsImpl.prototype.increment = function (state) {
+        return __assign(__assign({}, state), { count: state.count + 1 });
+    };
+    return ActionsImpl;
+}());
+var _a = Object(_src_tiny_context__WEBPACK_IMPORTED_MODULE_1__["createTinyContext"])(new ActionsImpl()), Provider = _a.Provider, useContext = _a.useContext;
+var Button = function () {
+    var increment = useContext().actions.increment;
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", { onClick: increment }, "+");
+};
+var Display = function () {
+    var count = useContext().state.count;
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, count);
+};
+var ClassBasedApp = function () { return (react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Provider, { value: { count: 0 } },
+    "ClassBasedApp: ",
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Button, null),
+    " ",
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Display, null))); };
+
+
+/***/ }),
+
+/***/ "./examples/generator/GeneratorApp.tsx":
+/*!*********************************************!*\
+  !*** ./examples/generator/GeneratorApp.tsx ***!
+  \*********************************************/
+/*! exports provided: GeneratorApp */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GeneratorApp", function() { return GeneratorApp; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _wait__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../wait */ "./examples/wait.ts");
+/* harmony import */ var _src_tiny_context__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../src/tiny-context */ "./src/tiny-context.tsx");
+var __assign = (undefined && undefined.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __generator = (undefined && undefined.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+var __await = (undefined && undefined.__await) || function (v) { return this instanceof __await ? (this.v = v, this) : new __await(v); }
+var __asyncGenerator = (undefined && undefined.__asyncGenerator) || function (thisArg, _arguments, generator) {
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var g = generator.apply(thisArg, _arguments || []), i, q = [];
+    return i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i;
+    function verb(n) { if (g[n]) i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; }
+    function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }
+    function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r); }
+    function fulfill(value) { resume("next", value); }
+    function reject(value) { resume("throw", value); }
+    function settle(f, v) { if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]); }
+};
+
+
+
+var ActionsImpl = /** @class */ (function () {
+    function ActionsImpl() {
+    }
+    ActionsImpl.prototype.setLock = function (state, lock) {
+        return __assign(__assign({}, state), { lock: lock });
+    };
+    ActionsImpl.prototype.increment = function (state) {
+        return __asyncGenerator(this, arguments, function increment_1() {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        state = this.setLock(state, true);
+                        return [4 /*yield*/, __await(state)];
+                    case 1: return [4 /*yield*/, _a.sent()];
+                    case 2:
+                        _a.sent();
+                        return [4 /*yield*/, __await(Object(_wait__WEBPACK_IMPORTED_MODULE_1__["wait"])())];
+                    case 3:
+                        _a.sent();
+                        state.count = state.count + 1;
+                        return [4 /*yield*/, __await(state)];
+                    case 4: return [4 /*yield*/, _a.sent()];
+                    case 5:
+                        _a.sent();
+                        return [4 /*yield*/, __await(this.setLock(state, false))];
+                    case 6: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    return ActionsImpl;
+}());
+var _a = Object(_src_tiny_context__WEBPACK_IMPORTED_MODULE_2__["createTinyContext"])(new ActionsImpl()), Provider = _a.Provider, useContext = _a.useContext;
+var Button = function () {
+    var _a = useContext(), lock = _a.state.lock, increment = _a.actions.increment;
+    return (react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", { disabled: lock, onClick: increment }, "+"));
+};
+var Display = function () {
+    var count = useContext().state.count;
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, count);
+};
+var GeneratorApp = function () { return (react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Provider, { value: { count: 0, lock: false } },
+    "GeneratorApp: ",
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Button, null),
+    " ",
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Display, null))); };
+
+
+/***/ }),
+
+/***/ "./examples/main.tsx":
+/*!***************************!*\
+  !*** ./examples/main.tsx ***!
+  \***************************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _todo_TodoApp__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./todo/TodoApp */ "./examples/todo/TodoApp.tsx");
+/* harmony import */ var _async_AsyncApp__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./async/AsyncApp */ "./examples/async/AsyncApp.tsx");
+/* harmony import */ var _generator_GeneratorApp__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./generator/GeneratorApp */ "./examples/generator/GeneratorApp.tsx");
+/* harmony import */ var _minimum_MinimumApp__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./minimum/MinimumApp */ "./examples/minimum/MinimumApp.tsx");
+/* harmony import */ var _class_based_ClassBasedApp__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./class-based/ClassBasedApp */ "./examples/class-based/ClassBasedApp.tsx");
+
+
+
+
+
+
+
+react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null,
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_minimum_MinimumApp__WEBPACK_IMPORTED_MODULE_5__["MinimumApp"], null),
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null),
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_class_based_ClassBasedApp__WEBPACK_IMPORTED_MODULE_6__["ClassBasedApp"], null),
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null),
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_async_AsyncApp__WEBPACK_IMPORTED_MODULE_3__["AsyncApp"], null),
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null),
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_generator_GeneratorApp__WEBPACK_IMPORTED_MODULE_4__["GeneratorApp"], null),
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null),
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_todo_TodoApp__WEBPACK_IMPORTED_MODULE_2__["default"], null)), document.getElementById('root'));
+
+
+/***/ }),
+
+/***/ "./examples/minimum/MinimumApp.tsx":
+/*!*****************************************!*\
+  !*** ./examples/minimum/MinimumApp.tsx ***!
+  \*****************************************/
+/*! exports provided: MinimumApp */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MinimumApp", function() { return MinimumApp; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _src_tiny_context__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../src/tiny-context */ "./src/tiny-context.tsx");
+var __assign = (undefined && undefined.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+
+
+var _a = Object(_src_tiny_context__WEBPACK_IMPORTED_MODULE_1__["createTinyContext"])({
+    increment: function (state) { return (__assign(__assign({}, state), { count: state.count + 1 })); }
+}), Provider = _a.Provider, useContext = _a.useContext;
+var Button = function () {
+    var increment = useContext().actions.increment;
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", { onClick: increment }, "+");
+};
+var Display = function () {
+    var count = useContext().state.count;
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, count);
+};
+var MinimumApp = function () { return (react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Provider, { value: { count: 0 } },
+    "MinimumApp: ",
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Button, null),
+    " ",
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Display, null))); };
+
+
+/***/ }),
+
+/***/ "./examples/todo/AdditionalForm.tsx":
+/*!******************************************!*\
+  !*** ./examples/todo/AdditionalForm.tsx ***!
+  \******************************************/
 /*! exports provided: AdditionalForm */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -98,7 +458,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AdditionalForm", function() { return AdditionalForm; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _TodoProvider__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./TodoProvider */ "./examples/TodoProvider.tsx");
+/* harmony import */ var _TodoProvider__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./TodoProvider */ "./examples/todo/TodoProvider.tsx");
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -164,10 +524,10 @@ var AdditionalForm = function () {
 
 /***/ }),
 
-/***/ "./examples/TodoApp.tsx":
-/*!******************************!*\
-  !*** ./examples/TodoApp.tsx ***!
-  \******************************/
+/***/ "./examples/todo/TodoApp.tsx":
+/*!***********************************!*\
+  !*** ./examples/todo/TodoApp.tsx ***!
+  \***********************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -175,15 +535,16 @@ var AdditionalForm = function () {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _TodoProvider__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./TodoProvider */ "./examples/TodoProvider.tsx");
-/* harmony import */ var _AdditionalForm__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./AdditionalForm */ "./examples/AdditionalForm.tsx");
-/* harmony import */ var _TodoList__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./TodoList */ "./examples/TodoList.tsx");
+/* harmony import */ var _TodoProvider__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./TodoProvider */ "./examples/todo/TodoProvider.tsx");
+/* harmony import */ var _AdditionalForm__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./AdditionalForm */ "./examples/todo/AdditionalForm.tsx");
+/* harmony import */ var _TodoList__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./TodoList */ "./examples/todo/TodoList.tsx");
 
 
 
 
 var TodoApp = function () {
     return (react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_TodoProvider__WEBPACK_IMPORTED_MODULE_1__["TodoProvider"], null,
+        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "TodoApp"),
         react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_AdditionalForm__WEBPACK_IMPORTED_MODULE_2__["AdditionalForm"], null),
         react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_TodoList__WEBPACK_IMPORTED_MODULE_3__["TodoList"], null)));
 };
@@ -192,10 +553,10 @@ var TodoApp = function () {
 
 /***/ }),
 
-/***/ "./examples/TodoList.tsx":
-/*!*******************************!*\
-  !*** ./examples/TodoList.tsx ***!
-  \*******************************/
+/***/ "./examples/todo/TodoList.tsx":
+/*!************************************!*\
+  !*** ./examples/todo/TodoList.tsx ***!
+  \************************************/
 /*! exports provided: TodoList */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -204,7 +565,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TodoList", function() { return TodoList; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _TodoProvider__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./TodoProvider */ "./examples/TodoProvider.tsx");
+/* harmony import */ var _TodoProvider__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./TodoProvider */ "./examples/todo/TodoProvider.tsx");
 var __assign = (undefined && undefined.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -255,8 +616,8 @@ var __generator = (undefined && undefined.__generator) || function (thisArg, bod
 
 
 var TodoList = function () {
-    var _a = Object(_TodoProvider__WEBPACK_IMPORTED_MODULE_1__["useTodoContext"])(), todos = _a.state.todos, _b = _a.actions, update = _b.update, showProgress = _b.showProgress, hideProgress = _b.hideProgress;
-    var onCheckd = function (i, todo, checked) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a = Object(_TodoProvider__WEBPACK_IMPORTED_MODULE_1__["useTodoContext"])(), _b = _a.state, todos = _b.todos, progress = _b.progress, _c = _a.actions, update = _c.update, showProgress = _c.showProgress, hideProgress = _c.hideProgress;
+    var onChange = function (i, todo, checked) { return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, showProgress()];
@@ -273,17 +634,18 @@ var TodoList = function () {
         });
     }); };
     return (react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("ul", null, todos.map(function (todo, i) { return (react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("li", { key: i },
-        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", { style: { textDecoration: todo.completed ? 'line-through' : '' } }, todo.text),
-        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", { type: "checkbox", checked: todo.completed, onChange: function (e) { return onCheckd(i, todo, e.target.checked); } }))); })));
+        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", { id: i + "_check", type: "checkbox", disabled: progress, checked: todo.completed, onChange: function (e) { return onChange(i, todo, e.target.checked); } }),
+        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", { htmlFor: i + "_check" },
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", { style: { textDecoration: todo.completed ? 'line-through' : '' } }, todo.text)))); })));
 };
 
 
 /***/ }),
 
-/***/ "./examples/TodoProvider.tsx":
-/*!***********************************!*\
-  !*** ./examples/TodoProvider.tsx ***!
-  \***********************************/
+/***/ "./examples/todo/TodoProvider.tsx":
+/*!****************************************!*\
+  !*** ./examples/todo/TodoProvider.tsx ***!
+  \****************************************/
 /*! exports provided: useTodoContext, TodoProvider */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -293,7 +655,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TodoProvider", function() { return TodoProvider; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _src_tiny_context__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../src/tiny-context */ "./src/tiny-context.tsx");
+/* harmony import */ var _wait__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../wait */ "./examples/wait.ts");
+/* harmony import */ var _src_tiny_context__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../src/tiny-context */ "./src/tiny-context.tsx");
 var __assign = (undefined && undefined.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -341,6 +704,18 @@ var __generator = (undefined && undefined.__generator) || function (thisArg, bod
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __await = (undefined && undefined.__await) || function (v) { return this instanceof __await ? (this.v = v, this) : new __await(v); }
+var __asyncGenerator = (undefined && undefined.__asyncGenerator) || function (thisArg, _arguments, generator) {
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var g = generator.apply(thisArg, _arguments || []), i, q = [];
+    return i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i;
+    function verb(n) { if (g[n]) i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; }
+    function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }
+    function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r); }
+    function fulfill(value) { resume("next", value); }
+    function reject(value) { resume("throw", value); }
+    function settle(f, v) { if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]); }
+};
 var __spreadArrays = (undefined && undefined.__spreadArrays) || function () {
     for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
     for (var r = Array(s), k = 0, i = 0; i < il; i++)
@@ -350,36 +725,42 @@ var __spreadArrays = (undefined && undefined.__spreadArrays) || function () {
 };
 
 
-var _a = Object(_src_tiny_context__WEBPACK_IMPORTED_MODULE_1__["createTinyContext"])({
+
+var _a = Object(_src_tiny_context__WEBPACK_IMPORTED_MODULE_2__["createTinyContext"])({
     showProgress: function (state) { return (__assign(__assign({}, state), { progress: true })); },
     hideProgress: function (state) { return (__assign(__assign({}, state), { progress: false })); },
     add: function (state, todo) {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    state.progress = true;
-                    return [4 /*yield*/, state];
-                case 1:
-                    _a.sent();
-                    return [4 /*yield*/, new Promise(function (resolve) {
-                            return setTimeout(function () {
-                                var todos = __spreadArrays(state.todos, [todo]);
-                                state.todos = todos;
-                                resolve(state);
-                            }, 500);
-                        })];
-                case 2:
-                    _a.sent();
-                    state.progress = false;
-                    return [2 /*return*/, state];
-            }
+        return __asyncGenerator(this, arguments, function () {
+            var todos;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        state.progress = true;
+                        return [4 /*yield*/, __await(state)];
+                    case 1: return [4 /*yield*/, _a.sent()];
+                    case 2:
+                        _a.sent();
+                        return [4 /*yield*/, __await(Object(_wait__WEBPACK_IMPORTED_MODULE_1__["wait"])())];
+                    case 3:
+                        _a.sent();
+                        todos = __spreadArrays(state.todos, [todo]);
+                        state.todos = todos;
+                        return [4 /*yield*/, __await(state)];
+                    case 4: return [4 /*yield*/, _a.sent()];
+                    case 5:
+                        _a.sent();
+                        state.progress = false;
+                        return [4 /*yield*/, __await(state)];
+                    case 6: return [2 /*return*/, _a.sent()];
+                }
+            });
         });
     },
     update: function (state, index, todo) { return __awaiter(void 0, void 0, void 0, function () {
         var todos;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 500); })];
+                case 0: return [4 /*yield*/, Object(_wait__WEBPACK_IMPORTED_MODULE_1__["wait"])()];
                 case 1:
                     _a.sent();
                     todos = __spreadArrays(state.todos);
@@ -398,24 +779,17 @@ var TodoProvider = function (_a) {
 
 /***/ }),
 
-/***/ "./examples/main.tsx":
-/*!***************************!*\
-  !*** ./examples/main.tsx ***!
-  \***************************/
-/*! no exports provided */
+/***/ "./examples/wait.ts":
+/*!**************************!*\
+  !*** ./examples/wait.ts ***!
+  \**************************/
+/*! exports provided: wait */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
-/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _TodoApp__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./TodoApp */ "./examples/TodoApp.tsx");
-
-
-
-react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_TodoApp__WEBPACK_IMPORTED_MODULE_2__["default"], null), document.getElementById('root'));
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "wait", function() { return wait; });
+var wait = function () { return new Promise(function (resolve) { return setTimeout(resolve, 500); }); };
 
 
 /***/ }),

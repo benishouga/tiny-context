@@ -4,6 +4,8 @@ import { render, fireEvent, screen, wait, waitForElement } from '@testing-librar
 
 import { createTinyContext, InternalActions } from '../src/tiny-context';
 
+const wait10 = async () => new Promise(resolve => setTimeout(resolve, 10));
+
 describe('tiny-context', () => {
   describe('simple actions', () => {
     type State = { count: number };
@@ -232,7 +234,7 @@ describe('tiny-context', () => {
     type Actions = { increment: () => void };
     const { Provider, useContext } = createTinyContext<State, Actions>({
       increment: async state => {
-        await new Promise(resolve => setTimeout(resolve)); // wait for event loop
+        await wait10(); // wait for event loop
         return { count: state.count + 1 };
       }
     });
@@ -282,13 +284,13 @@ describe('tiny-context', () => {
     type Actions = { iiincrement: () => void };
     const { Provider, useContext } = createTinyContext<State, Actions>({
       iiincrement: async function*(state) {
-        await new Promise(resolve => setTimeout(resolve, 10));
+        await wait10();
         state.count++;
         yield state;
-        await new Promise(resolve => setTimeout(resolve, 10));
+        await wait10();
         state.count++;
         yield state;
-        await new Promise(resolve => setTimeout(resolve, 10));
+        await wait10();
         state.count++;
         return state;
       }
