@@ -10,96 +10,72 @@ This library for Context API of React Hooks. Easily create a context with a stat
 npm install tiny-context
 ```
 
-## Usage
+## Concept
 
-JavaScript
+This library wraps the React Context API and supports creating contexts with `{ state: { ... }, actions: { ... } }`.
 
-```jsx
-import React from 'react';
-import { createTinyContext } from 'tiny-context';
+- Easy to understand.
+- Easy to implement with less code.
+- Easy to create async action and generator action.
+- Easy to test.
+- TypeScript friendry.
 
-const { Provider, useContext } = createTinyContext({
-  increment: state => ({ ...state, count: state.count + 1 }),
-  decrement: state => ({ ...state, count: state.count - 1 })
-});
+## Steps to use
 
-const Buttons = () => {
-  const {
-    actions: { increment, decrement }
-  } = useContext();
-  return (
-    <span>
-      <button onClick={increment}>+</button>
-      <button onClick={decrement}>-</button>
-    </span>
-  );
-};
+1. Define state.
+   ```ts
+   type CounterState = { count: number };
+   ```
+2. Define actions external interface.
+   ```ts
+   type CounterActions = { increment: () => void };
+   ```
+3. Define actions that takes state as the first argument and returns state.
+   ```ts
+   const { Provider, useContext } = createTinyContext<CounterState, CounterActions>({
+     increment: state => ({ count: state.count + 1 })
+   });
+   ```
+4. Can be used like the Context API :)
 
-const Display = () => {
-  const {
-    state: { count }
-  } = useContext();
-  return <span>{count}</span>;
-};
+   ```tsx
+   const Buttons = () => {
+     const {
+       actions: { increment }
+     } = useContext();
+     return <button onClick={increment}>+</button>;
+   };
 
-const CounterApp = () => {
-  return (
-    <Provider value={{ count: 0 }}>
-      <Buttons />
-      <Display />
-    </Provider>
-  );
-};
-```
+   const Display = () => {
+     const {
+       state: { count }
+     } = useContext();
+     return <span>{count}</span>;
+   };
 
-TypeScript
+   const CounterApp = () => (
+     <Provider value={{ count: 0 }}>
+       <Buttons />
+       <Display />
+     </Provider>
+   );
+   ```
 
-```tsx
-import React from 'react';
-import { createTinyContext } from 'tiny-context';
+### Examples
 
-interface CounterState {
-  count: number;
-}
+Class-based actions, Async action, Generator action and Todo App examples.
 
-interface CounterActions {
-  increment: () => void;
-  decrement: () => void;
-}
+https://benishouga.github.io/tiny-context/
 
-const { Provider, useContext } = createTinyContext<CounterState, CounterActions>({
-  increment: state => ({ ...state, count: state.count + 1 }),
-  decrement: state => ({ ...state, count: state.count - 1 })
-});
+### Limitation
 
-const Buttons = () => {
-  const {
-    actions: { increment, decrement }
-  } = useContext();
-  return (
-    <span>
-      <button onClick={increment}>+</button>
-      <button onClick={decrement}>-</button>
-    </span>
-  );
-};
+- Any action in the same context is executed sequentially.
+  - If you want to process in parallel like incremental search, control it out of context.
+- Not support to cancel a action in processing.
 
-const Display = () => {
-  const {
-    state: { count }
-  } = useContext();
-  return <span>{count}</span>;
-};
+## Contributions
 
-const CounterApp = () => {
-  return (
-    <Provider value={{ count: 0 }}>
-      <Buttons />
-      <Display />
-    </Provider>
-  );
-};
-```
+I make heavy use of Google Translate. Please tell me if my English is wrong :)
 
 ## Lisence
 
