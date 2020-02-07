@@ -422,6 +422,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null,
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("a", { href: "https://github.com/benishouga/tiny-context" }, "https://github.com/benishouga/tiny-context"),
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null),
     react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_minimum_MinimumApp__WEBPACK_IMPORTED_MODULE_5__["MinimumApp"], null),
     react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_CodePreviewer__WEBPACK_IMPORTED_MODULE_7__["CodePreviewer"], { name: "MinimumApp.tsx", code: __webpack_require__(/*! !raw-loader!./minimum/MinimumApp.tsx */ "./node_modules/raw-loader/dist/cjs.js!./examples/minimum/MinimumApp.tsx").default }),
     react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null),
