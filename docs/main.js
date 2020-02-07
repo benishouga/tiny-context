@@ -771,15 +771,21 @@ var __spreadArrays = (undefined && undefined.__spreadArrays) || function () {
 
 
 
-var _a = Object(_src_tiny_context__WEBPACK_IMPORTED_MODULE_2__["createTinyContext"])({
-    showProgress: function (state) { return (__assign(__assign({}, state), { progress: true })); },
-    hideProgress: function (state) { return (__assign(__assign({}, state), { progress: false })); },
-    add: function (state, todo) {
-        return __asyncGenerator(this, arguments, function () {
+var ActionImpl = /** @class */ (function () {
+    function ActionImpl() {
+    }
+    ActionImpl.prototype.showProgress = function (state) {
+        return __assign(__assign({}, state), { progress: true });
+    };
+    ActionImpl.prototype.hideProgress = function (state) {
+        return __assign(__assign({}, state), { progress: false });
+    };
+    ActionImpl.prototype.add = function (state, todo) {
+        return __asyncGenerator(this, arguments, function add_1() {
             var todos;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, __await(__assign(__assign({}, state), { progress: true }))];
+                    case 0: return [4 /*yield*/, __await(this.showProgress(state))];
                     case 1: return [4 /*yield*/, _a.sent()];
                     case 2:
                         state = _a.sent();
@@ -791,26 +797,30 @@ var _a = Object(_src_tiny_context__WEBPACK_IMPORTED_MODULE_2__["createTinyContex
                     case 4: return [4 /*yield*/, _a.sent()];
                     case 5:
                         state = _a.sent();
-                        return [4 /*yield*/, __await(__assign(__assign({}, state), { progress: false }))];
+                        return [4 /*yield*/, __await(this.hideProgress(state))];
                     case 6: return [2 /*return*/, _a.sent()];
                 }
             });
         });
-    },
-    update: function (state, index, todo) { return __awaiter(void 0, void 0, void 0, function () {
-        var todos;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, Object(_wait__WEBPACK_IMPORTED_MODULE_1__["wait"])()];
-                case 1:
-                    _a.sent(); // network delays...
-                    todos = __spreadArrays(state.todos);
-                    todos[index] = todo;
-                    return [2 /*return*/, __assign(__assign({}, state), { todos: todos })];
-            }
+    };
+    ActionImpl.prototype.update = function (state, index, todo) {
+        return __awaiter(this, void 0, void 0, function () {
+            var todos;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, Object(_wait__WEBPACK_IMPORTED_MODULE_1__["wait"])()];
+                    case 1:
+                        _a.sent(); // network delays...
+                        todos = __spreadArrays(state.todos);
+                        todos[index] = todo;
+                        return [2 /*return*/, __assign(__assign({}, state), { todos: todos })];
+                }
+            });
         });
-    }); }
-}), Provider = _a.Provider, useContext = _a.useContext;
+    };
+    return ActionImpl;
+}());
+var _a = Object(_src_tiny_context__WEBPACK_IMPORTED_MODULE_2__["createTinyContext"])(new ActionImpl()), Provider = _a.Provider, useContext = _a.useContext;
 var useTodoContext = useContext;
 var TodoProvider = function (_a) {
     var children = _a.children;
@@ -28954,7 +28964,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("import React from 'react';\nimport { wait } from '../wait';\nimport { createTinyContext } from '../../src/tiny-context';\n\nexport interface Todo {\n  text: string;\n  completed: boolean;\n}\n\nexport interface TodoState {\n  todos: Todo[];\n  progress: boolean;\n}\n\nexport interface TodoActions {\n  showProgress: () => void;\n  hideProgress: () => void;\n  add: (todo: Todo) => Promise<void>;\n  update: (index: number, todo: Todo) => Promise<void>;\n}\n\nconst { Provider, useContext } = createTinyContext<TodoState, TodoActions>({\n  showProgress: state => ({ ...state, progress: true }),\n  hideProgress: state => ({ ...state, progress: false }),\n  add: async function*(state, todo) {\n    state = yield { ...state, progress: true };\n\n    await wait(); // network delays...\n    const todos = [...state.todos, todo];\n    state = yield { ...state, todos };\n\n    return { ...state, progress: false };\n  },\n  update: async (state, index, todo) => {\n    await wait(); // network delays...\n    const todos = [...state.todos];\n    todos[index] = todo;\n    return { ...state, todos };\n  }\n});\n\nexport const useTodoContext = useContext;\n\nexport const TodoProvider = ({ children }: { children: React.ReactNode }): JSX.Element => {\n  return <Provider value={{ todos: [], progress: false }}>{children}</Provider>;\n};\n");
+/* harmony default export */ __webpack_exports__["default"] = ("import React from 'react';\nimport { wait } from '../wait';\nimport { createTinyContext, InternalActions } from '../../src/tiny-context';\n\nexport interface Todo {\n  text: string;\n  completed: boolean;\n}\n\nexport interface TodoState {\n  todos: Todo[];\n  progress: boolean;\n}\n\nexport interface TodoActions {\n  showProgress: () => void;\n  hideProgress: () => void;\n  add: (todo: Todo) => Promise<void>;\n  update: (index: number, todo: Todo) => Promise<void>;\n}\n\nclass ActionImpl implements InternalActions<TodoState, TodoActions> {\n  showProgress(state: TodoState) {\n    return { ...state, progress: true };\n  }\n\n  hideProgress(state: TodoState) {\n    return { ...state, progress: false };\n  }\n\n  async *add(state: TodoState, todo: Todo) {\n    state = yield this.showProgress(state);\n\n    await wait(); // network delays...\n    const todos = [...state.todos, todo];\n    state = yield { ...state, todos };\n\n    return this.hideProgress(state);\n  }\n\n  async update(state: TodoState, index: number, todo: Todo) {\n    await wait(); // network delays...\n    const todos = [...state.todos];\n    todos[index] = todo;\n    return { ...state, todos };\n  }\n}\n\nconst { Provider, useContext } = createTinyContext<TodoState, TodoActions>(new ActionImpl());\n\nexport const useTodoContext = useContext;\n\nexport const TodoProvider = ({ children }: { children: React.ReactNode }): JSX.Element => {\n  return <Provider value={{ todos: [], progress: false }}>{children}</Provider>;\n};\n");
 
 /***/ }),
 

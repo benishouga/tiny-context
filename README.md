@@ -61,13 +61,59 @@ This library wraps the React Context API and supports creating contexts with `{ 
    );
    ```
 
-### Examples
+## Examples
 
-Class-based actions, Async action, Generator action and Todo App examples.
-
+Class-based actions, Async action, Generator action and Todo App examples.<br>
 https://benishouga.github.io/tiny-context/
 
-### Limitation
+## API
+
+### type InternalActions
+
+```ts
+import { InternalActions } from 'tiny-context';
+
+type SomeInternalActions = InternalActions<State, Actions>;
+```
+
+Given `State` and `Actions` interface, get a `InternalActions` interface.
+
+`Actions` methods must return a `Promise<void>`. (Although `void` can be specified, `Promise<void>` is actually returned.)
+
+`InternalActions` methods require the first argument to be `State` and the return value to be `State` (or [`Promise`, `Generator`](https://benishouga.github.io/tiny-context/)). The second and subsequent arguments are the same as for `Actions`.
+
+### createTinyContext
+
+```ts
+import { createTinyContext, InternalActions } from 'tiny-context';
+
+class SomeActionImpl implements InternalActions<State, Actions> { ... }
+const { Provider, useContext } = createTinyContext<State, Actions>(new SomeActionImpl());
+```
+
+`Provider` is same as [`Provider of React`](https://reactjs.org/docs/context.html#contextprovider).
+
+```tsx
+const SomeApp = () => (
+  <Provider value={{...}}>
+    <SomeConsumer />
+  </Provider>
+);
+```
+
+`useContext` is hooks used on a consumer. Not need arguments.
+
+```tsx
+const SomeConsumer = () => {
+  const {
+    state: {...},
+    actions: {...}
+  } = useContext();
+
+};
+```
+
+## Limitation
 
 - Any action in the same context is executed sequentially.
   - If you want to process in parallel like incremental search, control it out of context.

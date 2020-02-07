@@ -1,6 +1,6 @@
 import React from 'react';
 import { wait } from '../wait';
-import { createTinyContext } from '../../src/tiny-context';
+import { createTinyContext, InternalActions } from '../../src/tiny-context';
 
 export interface Todo {
   text: string;
@@ -19,25 +19,34 @@ export interface TodoActions {
   update: (index: number, todo: Todo) => Promise<void>;
 }
 
-const { Provider, useContext } = createTinyContext<TodoState, TodoActions>({
-  showProgress: state => ({ ...state, progress: true }),
-  hideProgress: state => ({ ...state, progress: false }),
-  add: async function*(state, todo) {
-    state = yield { ...state, progress: true };
+class ActionImpl implements InternalActions<TodoState, TodoActions> {
+  showProgress(state: TodoState) {
+    return { ...state, progress: true };
+  }
+
+  hideProgress(state: TodoState) {
+    return { ...state, progress: false };
+  }
+
+  async *add(state: TodoState, todo: Todo) {
+    state = yield this.showProgress(state);
 
     await wait(); // network delays...
     const todos = [...state.todos, todo];
     state = yield { ...state, todos };
 
-    return { ...state, progress: false };
-  },
-  update: async (state, index, todo) => {
+    return this.hideProgress(state);
+  }
+
+  async update(state: TodoState, index: number, todo: Todo) {
     await wait(); // network delays...
     const todos = [...state.todos];
     todos[index] = todo;
     return { ...state, todos };
   }
-});
+}
+
+const { Provider, useContext } = createTinyContext<TodoState, TodoActions>(new ActionImpl());
 
 export const useTodoContext = useContext;
 
