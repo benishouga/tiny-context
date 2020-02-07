@@ -128,7 +128,7 @@ export function createTinyContext(actions) {
                                 _b.label = 2;
                             case 2:
                                 if (!true) return [3 /*break*/, 5];
-                                return [4 /*yield*/, actionResult.next()];
+                                return [4 /*yield*/, actionResult.next(memo.state)];
                             case 3:
                                 result = _b.sent();
                                 _a = feed;

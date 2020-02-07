@@ -5,7 +5,7 @@ declare type Actions<A> = {
 };
 declare type InternalActionResult<S> = ActionResult<S> | GeneratorResult<S>;
 declare type ActionResult<S> = void | S | Promise<void> | Promise<S>;
-declare type GeneratorResult<S> = Generator<ActionResult<S>, ActionResult<S>> | AsyncGenerator<ActionResult<S>, ActionResult<S>>;
+declare type GeneratorResult<S> = Generator<ActionResult<S>, ActionResult<S>, S> | AsyncGenerator<ActionResult<S>, ActionResult<S>, S>;
 export declare type InternalActions<S, A extends Actions<A>> = {
     [P in keyof A]: (state: S, ...args: Parameters<A[P]>) => InternalActionResult<S>;
 };

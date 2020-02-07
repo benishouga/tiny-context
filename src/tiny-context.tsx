@@ -6,8 +6,8 @@ type Actions<A> = { [P in keyof A]: Action };
 type InternalActionResult<S> = ActionResult<S> | GeneratorResult<S>;
 type ActionResult<S> = void | S | Promise<void> | Promise<S>;
 type GeneratorResult<S> =
-  | Generator<ActionResult<S>, ActionResult<S>>
-  | AsyncGenerator<ActionResult<S>, ActionResult<S>>;
+  | Generator<ActionResult<S>, ActionResult<S>, S>
+  | AsyncGenerator<ActionResult<S>, ActionResult<S>, S>;
 
 export type InternalActions<S, A extends Actions<A>> = {
   [P in keyof A]: (state: S, ...args: Parameters<A[P]>) => InternalActionResult<S>;
@@ -80,7 +80,7 @@ export function createTinyContext<S, A extends Actions<A>>(actions: InternalActi
             return;
           }
           while (true) {
-            const result = await actionResult.next();
+            const result = await actionResult.next(memo.state);
             feed(await result.value);
             if (result.done) break;
           }

@@ -23,19 +23,16 @@ const { Provider, useContext } = createTinyContext<TodoState, TodoActions>({
   showProgress: state => ({ ...state, progress: true }),
   hideProgress: state => ({ ...state, progress: false }),
   add: async function*(state, todo) {
-    state.progress = true;
-    yield state;
+    state = yield { ...state, progress: true };
 
-    await wait();
+    await wait(); // network delays...
     const todos = [...state.todos, todo];
-    state.todos = todos;
-    yield state;
+    state = yield { ...state, todos };
 
-    state.progress = false;
-    return state;
+    return { ...state, progress: false };
   },
   update: async (state, index, todo) => {
-    await wait();
+    await wait(); // network delays...
     const todos = [...state.todos];
     todos[index] = todo;
     return { ...state, todos };

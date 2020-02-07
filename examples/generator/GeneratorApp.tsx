@@ -10,12 +10,10 @@ class ActionsImpl implements InternalActions<State, Actions> {
     return { ...state, lock };
   }
   async *increment(state: State) {
-    state = this.setLock(state, true);
-    yield state;
+    state = yield this.setLock(state, true);
 
-    await wait();
-    state.count = state.count + 1;
-    yield state;
+    await wait(); // network delays...
+    state = yield { ...state, count: state.count + 1 };
 
     return this.setLock(state, false);
   }

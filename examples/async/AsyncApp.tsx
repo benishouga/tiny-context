@@ -8,7 +8,7 @@ type Actions = { setLock: (lock: boolean) => void; increment: () => Promise<void
 const { Provider, useContext } = createTinyContext<State, Actions>({
   setLock: (state, lock) => ({ ...state, lock }),
   increment: async state => {
-    await wait();
+    await wait(); // network delays...
     return { ...state, count: state.count + 1 };
   }
 });

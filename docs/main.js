@@ -157,7 +157,7 @@ var _a = Object(_src_tiny_context__WEBPACK_IMPORTED_MODULE_2__["createTinyContex
             switch (_a.label) {
                 case 0: return [4 /*yield*/, Object(_wait__WEBPACK_IMPORTED_MODULE_1__["wait"])()];
                 case 1:
-                    _a.sent();
+                    _a.sent(); // network delays...
                     return [2 /*return*/, __assign(__assign({}, state), { count: state.count + 1 })];
             }
         });
@@ -321,20 +321,17 @@ var ActionsImpl = /** @class */ (function () {
         return __asyncGenerator(this, arguments, function increment_1() {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        state = this.setLock(state, true);
-                        return [4 /*yield*/, __await(state)];
+                    case 0: return [4 /*yield*/, __await(this.setLock(state, true))];
                     case 1: return [4 /*yield*/, _a.sent()];
                     case 2:
-                        _a.sent();
+                        state = _a.sent();
                         return [4 /*yield*/, __await(Object(_wait__WEBPACK_IMPORTED_MODULE_1__["wait"])())];
                     case 3:
-                        _a.sent();
-                        state.count = state.count + 1;
-                        return [4 /*yield*/, __await(state)];
+                        _a.sent(); // network delays...
+                        return [4 /*yield*/, __await(__assign(__assign({}, state), { count: state.count + 1 }))];
                     case 4: return [4 /*yield*/, _a.sent()];
                     case 5:
-                        _a.sent();
+                        state = _a.sent();
                         return [4 /*yield*/, __await(this.setLock(state, false))];
                     case 6: return [2 /*return*/, _a.sent()];
                 }
@@ -734,23 +731,19 @@ var _a = Object(_src_tiny_context__WEBPACK_IMPORTED_MODULE_2__["createTinyContex
             var todos;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        state.progress = true;
-                        return [4 /*yield*/, __await(state)];
+                    case 0: return [4 /*yield*/, __await(__assign(__assign({}, state), { progress: true }))];
                     case 1: return [4 /*yield*/, _a.sent()];
                     case 2:
-                        _a.sent();
+                        state = _a.sent();
                         return [4 /*yield*/, __await(Object(_wait__WEBPACK_IMPORTED_MODULE_1__["wait"])())];
                     case 3:
-                        _a.sent();
+                        _a.sent(); // network delays...
                         todos = __spreadArrays(state.todos, [todo]);
-                        state.todos = todos;
-                        return [4 /*yield*/, __await(state)];
+                        return [4 /*yield*/, __await(__assign(__assign({}, state), { todos: todos }))];
                     case 4: return [4 /*yield*/, _a.sent()];
                     case 5:
-                        _a.sent();
-                        state.progress = false;
-                        return [4 /*yield*/, __await(state)];
+                        state = _a.sent();
+                        return [4 /*yield*/, __await(__assign(__assign({}, state), { progress: false }))];
                     case 6: return [2 /*return*/, _a.sent()];
                 }
             });
@@ -762,7 +755,7 @@ var _a = Object(_src_tiny_context__WEBPACK_IMPORTED_MODULE_2__["createTinyContex
             switch (_a.label) {
                 case 0: return [4 /*yield*/, Object(_wait__WEBPACK_IMPORTED_MODULE_1__["wait"])()];
                 case 1:
-                    _a.sent();
+                    _a.sent(); // network delays...
                     todos = __spreadArrays(state.todos);
                     todos[index] = todo;
                     return [2 /*return*/, __assign(__assign({}, state), { todos: todos })];
@@ -32762,7 +32755,7 @@ function createTinyContext(actions) {
                                 _b.label = 2;
                             case 2:
                                 if (false) {}
-                                return [4 /*yield*/, actionResult.next()];
+                                return [4 /*yield*/, actionResult.next(memo.state)];
                             case 3:
                                 result = _b.sent();
                                 _a = feed;

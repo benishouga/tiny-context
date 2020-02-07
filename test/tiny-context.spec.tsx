@@ -285,14 +285,11 @@ describe('tiny-context', () => {
     const { Provider, useContext } = createTinyContext<State, Actions>({
       iiincrement: async function*(state) {
         await wait10();
-        state.count++;
-        yield state;
+        state = yield { ...state, count: state.count + 1 };
         await wait10();
-        state.count++;
-        yield state;
+        state = yield { ...state, count: state.count + 1 };
         await wait10();
-        state.count++;
-        return state;
+        return { ...state, count: state.count + 1 };
       }
     });
     const IncrementButton = () => {
