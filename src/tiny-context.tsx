@@ -8,6 +8,7 @@ type ActionResult<S> = void | S | Promise<void> | Promise<S>;
 type GeneratorResult<S> =
   | Generator<ActionResult<S>, ActionResult<S>, S>
   | AsyncGenerator<ActionResult<S>, ActionResult<S>, S>;
+type ContextState<S, A> = { state: S; actions: A };
 
 export type InternalActions<S, A extends Actions<A>> = {
   [P in keyof A]: (state: S, ...args: Parameters<A[P]>) => InternalActionResult<S>;
@@ -60,7 +61,7 @@ export function createStore<S, A extends Actions<A>>(
   value: S,
   onStateChanged: (s: S) => void,
   actions: InternalActions<S, A>
-): () => { state: S; actions: A } {
+): () => ContextState<S, A> {
   let state: S = value;
   const queue = new Queue();
 
@@ -105,11 +106,11 @@ export function createStore<S, A extends Actions<A>>(
 }
 
 export function createTinyContext<S, A extends Actions<A>>(internalActions: InternalActions<S, A>) {
-  const Context = createContext<{ state: S; actions: A }>({} as any);
+  const Context = createContext<ContextState<S, A>>({} as any);
 
   const Provider = ({ value, children }: { value: S; children: React.ReactNode }) => {
     const { rerender } = useRerender();
-    const { state, actions } = useMemo<() => { state: S; actions: A }>(
+    const { state, actions } = useMemo<() => ContextState<S, A>>(
       () => createStore(value, rerender, internalActions),
       []
     )();
