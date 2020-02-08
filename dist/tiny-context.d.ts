@@ -9,7 +9,11 @@ declare type GeneratorResult<S> = Generator<ActionResult<S>, ActionResult<S>, S>
 export declare type InternalActions<S, A extends Actions<A>> = {
     [P in keyof A]: (state: S, ...args: Parameters<A[P]>) => InternalActionResult<S>;
 };
-export declare function createTinyContext<S, A extends Actions<A>>(actions: InternalActions<S, A>): {
+export declare function createStore<S, A extends Actions<A>>(value: S, onStateChanged: (s: S) => void, actions: InternalActions<S, A>): () => {
+    state: S;
+    actions: A;
+};
+export declare function createTinyContext<S, A extends Actions<A>>(internalActions: InternalActions<S, A>): {
     Provider: ({ value, children }: {
         value: S;
         children: React.ReactNode;

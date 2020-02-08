@@ -82389,11 +82389,12 @@ function extend() {
 /*!******************************!*\
   !*** ./src/tiny-context.tsx ***!
   \******************************/
-/*! exports provided: createTinyContext */
+/*! exports provided: createStore, createTinyContext */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createStore", function() { return createStore; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createTinyContext", function() { return createTinyContext; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
@@ -82494,75 +82495,81 @@ var Queue = /** @class */ (function () {
     };
     return Queue;
 }());
-function createTinyContext(actions) {
+function createStore(value, onStateChanged, actions) {
     var _this = this;
+    var state = value;
+    var queue = new Queue();
+    var feed = function (newState) {
+        if (newState !== null && newState !== undefined) {
+            state = __assign({}, newState);
+            onStateChanged(state);
+        }
+    };
+    var convertAction = function (action) { return function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        var task = function () { return __awaiter(_this, void 0, void 0, function () {
+            var actionResult, result, _a;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0: return [4 /*yield*/, action.bind(actions).apply(void 0, __spreadArrays([state], args))];
+                    case 1:
+                        actionResult = _b.sent();
+                        if (!isGenerator(actionResult)) {
+                            feed(actionResult);
+                            return [2 /*return*/];
+                        }
+                        _b.label = 2;
+                    case 2:
+                        if (false) {}
+                        return [4 /*yield*/, actionResult.next(state)];
+                    case 3:
+                        result = _b.sent();
+                        _a = feed;
+                        return [4 /*yield*/, result.value];
+                    case 4:
+                        _a.apply(void 0, [_b.sent()]);
+                        if (result.done)
+                            return [3 /*break*/, 5];
+                        return [3 /*break*/, 2];
+                    case 5: return [2 /*return*/];
+                }
+            });
+        }); };
+        return new Promise(function (resolve, reject) {
+            queue.push(function () { return __awaiter(_this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, task()
+                                .then(resolve)
+                                .catch(reject)];
+                        case 1:
+                            _a.sent();
+                            return [2 /*return*/];
+                    }
+                });
+            }); });
+        });
+    }; };
+    var convert = function () {
+        var external = {};
+        extract(actions).forEach(function (name) { return (external[name] = convertAction(actions[name])); });
+        return external;
+    };
+    var externalActions = convert();
+    return function () { return ({ state: state, actions: externalActions }); };
+}
+function createTinyContext(internalActions) {
     var Context = Object(react__WEBPACK_IMPORTED_MODULE_0__["createContext"])({});
     var Provider = function (_a) {
         var value = _a.value, children = _a.children;
         var rerender = useRerender().rerender;
-        var memo = Object(react__WEBPACK_IMPORTED_MODULE_0__["useMemo"])(function () { return ({ state: value, queue: new Queue() }); }, []);
+        var _b = Object(react__WEBPACK_IMPORTED_MODULE_0__["useMemo"])(function () { return createStore(value, rerender, internalActions); }, [])(), state = _b.state, actions = _b.actions;
         return Object(react__WEBPACK_IMPORTED_MODULE_0__["useMemo"])(function () {
-            var feed = function (newState) {
-                if (newState !== null && newState !== undefined) {
-                    memo.state = __assign({}, newState);
-                    rerender();
-                }
-            };
-            var convertAction = function (action) { return function () {
-                var args = [];
-                for (var _i = 0; _i < arguments.length; _i++) {
-                    args[_i] = arguments[_i];
-                }
-                var task = function () { return __awaiter(_this, void 0, void 0, function () {
-                    var actionResult, result, _a;
-                    return __generator(this, function (_b) {
-                        switch (_b.label) {
-                            case 0: return [4 /*yield*/, action.bind(actions).apply(void 0, __spreadArrays([memo.state], args))];
-                            case 1:
-                                actionResult = _b.sent();
-                                if (!isGenerator(actionResult)) {
-                                    feed(actionResult);
-                                    return [2 /*return*/];
-                                }
-                                _b.label = 2;
-                            case 2:
-                                if (false) {}
-                                return [4 /*yield*/, actionResult.next(memo.state)];
-                            case 3:
-                                result = _b.sent();
-                                _a = feed;
-                                return [4 /*yield*/, result.value];
-                            case 4:
-                                _a.apply(void 0, [_b.sent()]);
-                                if (result.done)
-                                    return [3 /*break*/, 5];
-                                return [3 /*break*/, 2];
-                            case 5: return [2 /*return*/];
-                        }
-                    });
-                }); };
-                return new Promise(function (resolve, reject) {
-                    memo.queue.push(function () { return __awaiter(_this, void 0, void 0, function () {
-                        return __generator(this, function (_a) {
-                            switch (_a.label) {
-                                case 0: return [4 /*yield*/, task()
-                                        .then(resolve)
-                                        .catch(reject)];
-                                case 1:
-                                    _a.sent();
-                                    return [2 /*return*/];
-                            }
-                        });
-                    }); });
-                });
-            }; };
-            var convert = function (actions) {
-                var external = {};
-                extract(actions).forEach(function (name) { return (external[name] = convertAction(actions[name])); });
-                return external;
-            };
-            return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Context.Provider, { value: { state: memo.state, actions: convert(actions) } }, children);
-        }, [memo.state]);
+            return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Context.Provider, { value: { state: state, actions: actions } }, children);
+        }, [state]);
     };
     return { Provider: Provider, useContext: function () { return Object(react__WEBPACK_IMPORTED_MODULE_0__["useContext"])(Context); } };
 }

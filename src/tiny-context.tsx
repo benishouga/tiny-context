@@ -56,53 +56,66 @@ class Queue {
   }
 }
 
-export function createTinyContext<S, A extends Actions<A>>(actions: InternalActions<S, A>) {
+export function createStore<S, A extends Actions<A>>(
+  value: S,
+  onStateChanged: (s: S) => void,
+  actions: InternalActions<S, A>
+): () => { state: S; actions: A } {
+  let state: S = value;
+  const queue = new Queue();
+
+  const feed = (newState: void | S) => {
+    if (newState !== null && newState !== undefined) {
+      state = { ...newState };
+      onStateChanged(state);
+    }
+  };
+
+  const convertAction = (action: (state: S, ...args: any) => InternalActionResult<S>) => (...args: any) => {
+    const task = async () => {
+      const actionResult = await action.bind(actions)(state, ...args);
+      if (!isGenerator<ActionResult<S>>(actionResult)) {
+        feed(actionResult);
+        return;
+      }
+      while (true) {
+        const result = await actionResult.next(state);
+        feed(await result.value);
+        if (result.done) break;
+      }
+    };
+
+    return new Promise<void>((resolve, reject) => {
+      queue.push(async () => {
+        await task()
+          .then(resolve)
+          .catch(reject);
+      });
+    });
+  };
+
+  const convert = () => {
+    const external: { [name: string]: (...args: any) => void | Promise<void> } = {};
+    extract(actions).forEach(name => (external[name] = convertAction((actions as any)[name])));
+    return external as A;
+  };
+
+  const externalActions = convert();
+  return () => ({ state, actions: externalActions });
+}
+
+export function createTinyContext<S, A extends Actions<A>>(internalActions: InternalActions<S, A>) {
   const Context = createContext<{ state: S; actions: A }>({} as any);
 
   const Provider = ({ value, children }: { value: S; children: React.ReactNode }) => {
     const { rerender } = useRerender();
-
-    const memo = useMemo<{ state: S; queue: Queue }>(() => ({ state: value, queue: new Queue() }), []);
-
+    const { state, actions } = useMemo<() => { state: S; actions: A }>(
+      () => createStore(value, rerender, internalActions),
+      []
+    )();
     return useMemo(() => {
-      const feed = (newState: void | S) => {
-        if (newState !== null && newState !== undefined) {
-          memo.state = { ...newState };
-          rerender();
-        }
-      };
-
-      const convertAction = (action: (state: S, ...args: any) => InternalActionResult<S>) => (...args: any) => {
-        const task = async () => {
-          const actionResult = await action.bind(actions)(memo.state, ...args);
-          if (!isGenerator<ActionResult<S>>(actionResult)) {
-            feed(actionResult);
-            return;
-          }
-          while (true) {
-            const result = await actionResult.next(memo.state);
-            feed(await result.value);
-            if (result.done) break;
-          }
-        };
-
-        return new Promise<void>((resolve, reject) => {
-          memo.queue.push(async () => {
-            await task()
-              .then(resolve)
-              .catch(reject);
-          });
-        });
-      };
-
-      const convert = (actions: InternalActions<S, A>) => {
-        const external: { [name: string]: (...args: any) => void | Promise<void> } = {};
-        extract(actions).forEach(name => (external[name] = convertAction((actions as any)[name])));
-        return external as A;
-      };
-
-      return <Context.Provider value={{ state: memo.state, actions: convert(actions) }}>{children}</Context.Provider>;
-    }, [memo.state]);
+      return <Context.Provider value={{ state, actions }}>{children}</Context.Provider>;
+    }, [state]);
   };
 
   return { Provider, useContext: () => useContext(Context) };
