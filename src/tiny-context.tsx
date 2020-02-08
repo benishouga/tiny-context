@@ -3,12 +3,13 @@ import React, { createContext, useContext, useState, useMemo } from 'react';
 type Action = (...args: any) => void | Promise<void>;
 type Actions<A> = { [P in keyof A]: Action };
 
-type InternalActionResult<S> = ActionResult<S> | GeneratorResult<S>;
+type ContextState<S, A> = { state: S; actions: A };
+
 type ActionResult<S> = void | S | Promise<void> | Promise<S>;
 type GeneratorResult<S> =
   | Generator<ActionResult<S>, ActionResult<S>, S>
   | AsyncGenerator<ActionResult<S>, ActionResult<S>, S>;
-type ContextState<S, A> = { state: S; actions: A };
+type InternalActionResult<S> = ActionResult<S> | GeneratorResult<S>;
 
 export type InternalActions<S, A extends Actions<A>> = {
   [P in keyof A]: (state: S, ...args: Parameters<A[P]>) => InternalActionResult<S>;
