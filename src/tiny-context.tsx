@@ -15,6 +15,12 @@ export type InternalActions<S, A extends Actions<A>> = {
   [P in keyof A]: (state: S, ...args: Parameters<A[P]>) => InternalActionResult<S>;
 };
 
+type ExcludeFirstParameters<T extends (...args: any) => any> = T extends (s: any, ...args: infer P) => any ? P : never;
+
+export type ExternalActions<A extends { [P in keyof A]: (...args: any) => any }> = {
+  [P in keyof A]: (...args: ExcludeFirstParameters<A[P]>) => void | Promise<void>;
+};
+
 function isGenerator<S>(obj: any): obj is GeneratorResult<S> {
   return obj && typeof obj.next === 'function' && typeof obj.throw === 'function' && typeof obj.return === 'function';
 }

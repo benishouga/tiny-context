@@ -186,7 +186,7 @@ var __generator = (undefined && undefined.__generator) || function (thisArg, bod
 
 
 
-var _a = Object(_src_tiny_context__WEBPACK_IMPORTED_MODULE_2__["createTinyContext"])({
+var actions = {
     setLock: function (state, lock) { return (__assign(__assign({}, state), { lock: lock })); },
     increment: function (state) { return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -198,7 +198,8 @@ var _a = Object(_src_tiny_context__WEBPACK_IMPORTED_MODULE_2__["createTinyContex
             }
         });
     }); }
-}), Provider = _a.Provider, useContext = _a.useContext;
+};
+var _a = Object(_src_tiny_context__WEBPACK_IMPORTED_MODULE_2__["createTinyContext"])(actions), Provider = _a.Provider, useContext = _a.useContext;
 var Button = function () {
     var _a = useContext(), lock = _a.state.lock, _b = _a.actions, setLock = _b.setLock, increment = _b.increment;
     return (react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", { disabled: lock, onClick: function () { return __awaiter(void 0, void 0, void 0, function () {
@@ -347,13 +348,13 @@ var __asyncGenerator = (undefined && undefined.__asyncGenerator) || function (th
 
 
 
-var ActionsImpl = /** @class */ (function () {
-    function ActionsImpl() {
+var Actions = /** @class */ (function () {
+    function Actions() {
     }
-    ActionsImpl.prototype.setLock = function (state, lock) {
+    Actions.prototype.setLock = function (state, lock) {
         return __assign(__assign({}, state), { lock: lock });
     };
-    ActionsImpl.prototype.increment = function (state) {
+    Actions.prototype.increment = function (state) {
         return __asyncGenerator(this, arguments, function increment_1() {
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -374,9 +375,9 @@ var ActionsImpl = /** @class */ (function () {
             });
         });
     };
-    return ActionsImpl;
+    return Actions;
 }());
-var _a = Object(_src_tiny_context__WEBPACK_IMPORTED_MODULE_2__["createTinyContext"])(new ActionsImpl()), Provider = _a.Provider, useContext = _a.useContext;
+var _a = Object(_src_tiny_context__WEBPACK_IMPORTED_MODULE_2__["createTinyContext"])(new Actions()), Provider = _a.Provider, useContext = _a.useContext;
 var Button = function () {
     var _a = useContext(), lock = _a.state.lock, increment = _a.actions.increment;
     return (react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", { disabled: lock, onClick: increment }, "+"));
@@ -471,9 +472,10 @@ var __assign = (undefined && undefined.__assign) || function () {
 };
 
 
-var _a = Object(_src_tiny_context__WEBPACK_IMPORTED_MODULE_1__["createTinyContext"])({
+var actions = {
     increment: function (state) { return (__assign(__assign({}, state), { count: state.count + 1 })); }
-}), Provider = _a.Provider, useContext = _a.useContext;
+};
+var _a = Object(_src_tiny_context__WEBPACK_IMPORTED_MODULE_1__["createTinyContext"])(actions), Provider = _a.Provider, useContext = _a.useContext;
 var Button = function () {
     var increment = useContext().actions.increment;
     return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", { onClick: increment }, "+");
@@ -771,16 +773,16 @@ var __spreadArrays = (undefined && undefined.__spreadArrays) || function () {
 
 
 
-var ActionImpl = /** @class */ (function () {
-    function ActionImpl() {
+var Actions = /** @class */ (function () {
+    function Actions() {
     }
-    ActionImpl.prototype.showProgress = function (state) {
+    Actions.prototype.showProgress = function (state) {
         return __assign(__assign({}, state), { progress: true });
     };
-    ActionImpl.prototype.hideProgress = function (state) {
+    Actions.prototype.hideProgress = function (state) {
         return __assign(__assign({}, state), { progress: false });
     };
-    ActionImpl.prototype.add = function (state, todo) {
+    Actions.prototype.add = function (state, todo) {
         return __asyncGenerator(this, arguments, function add_1() {
             var todos;
             return __generator(this, function (_a) {
@@ -803,7 +805,7 @@ var ActionImpl = /** @class */ (function () {
             });
         });
     };
-    ActionImpl.prototype.update = function (state, index, todo) {
+    Actions.prototype.update = function (state, index, todo) {
         return __awaiter(this, void 0, void 0, function () {
             var todos;
             return __generator(this, function (_a) {
@@ -818,13 +820,13 @@ var ActionImpl = /** @class */ (function () {
             });
         });
     };
-    return ActionImpl;
+    return Actions;
 }());
-var _a = Object(_src_tiny_context__WEBPACK_IMPORTED_MODULE_2__["createTinyContext"])(new ActionImpl()), Provider = _a.Provider, useContext = _a.useContext;
+var _a = Object(_src_tiny_context__WEBPACK_IMPORTED_MODULE_2__["createTinyContext"])(new Actions()), Provider = _a.Provider, useContext = _a.useContext;
 var useTodoContext = useContext;
 var TodoProvider = function (_a) {
     var children = _a.children;
-    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Provider, { value: { todos: [], progress: false } }, children);
+    return (react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Provider, { value: { todos: [], progress: false } }, children));
 };
 
 
@@ -28873,7 +28875,7 @@ function normalize(value) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("import React from 'react';\nimport { wait } from '../wait';\nimport { createTinyContext } from '../../src/tiny-context';\n\ntype State = { count: number; lock: boolean };\ntype Actions = { setLock: (lock: boolean) => void; increment: () => Promise<void> };\n\nconst { Provider, useContext } = createTinyContext<State, Actions>({\n  setLock: (state, lock) => ({ ...state, lock }),\n  increment: async state => {\n    await wait(); // network delays...\n    return { ...state, count: state.count + 1 };\n  }\n});\n\nconst Button = () => {\n  const {\n    state: { lock },\n    actions: { setLock, increment }\n  } = useContext();\n\n  return (\n    <button\n      disabled={lock}\n      onClick={async () => {\n        setLock(true);\n        await increment();\n        setLock(false);\n      }}\n    >\n      +\n    </button>\n  );\n};\n\nconst Display = () => {\n  const {\n    state: { count }\n  } = useContext();\n  return <>{count}</>;\n};\n\nexport const AsyncApp = () => (\n  <Provider value={{ count: 0, lock: false }}>\n    AsyncApp: <Button /> <Display />\n  </Provider>\n);\n");
+/* harmony default export */ __webpack_exports__["default"] = ("import React from 'react';\nimport { wait } from '../wait';\nimport { createTinyContext, ExternalActions } from '../../src/tiny-context';\n\ntype State = { count: number; lock: boolean };\n\nconst actions = {\n  setLock: (state: State, lock: boolean) => ({ ...state, lock }),\n  increment: async (state: State) => {\n    await wait(); // network delays...\n    return { ...state, count: state.count + 1 };\n  }\n};\n\nconst { Provider, useContext } = createTinyContext<State, ExternalActions<typeof actions>>(actions);\n\nconst Button = () => {\n  const {\n    state: { lock },\n    actions: { setLock, increment }\n  } = useContext();\n\n  return (\n    <button\n      disabled={lock}\n      onClick={async () => {\n        setLock(true);\n        await increment();\n        setLock(false);\n      }}\n    >\n      +\n    </button>\n  );\n};\n\nconst Display = () => {\n  const {\n    state: { count }\n  } = useContext();\n  return <>{count}</>;\n};\n\nexport const AsyncApp = () => (\n  <Provider value={{ count: 0, lock: false }}>\n    AsyncApp: <Button /> <Display />\n  </Provider>\n);\n");
 
 /***/ }),
 
@@ -28886,7 +28888,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("import React from 'react';\nimport { createTinyContext, InternalActions } from '../../src/tiny-context';\n\ntype State = { count: number };\ntype Actions = { increment: () => void };\n\nclass ActionsImpl implements InternalActions<State, Actions> {\n  increment(state: State) {\n    return { ...state, count: state.count + 1 };\n  }\n}\n\nconst { Provider, useContext } = createTinyContext<State, Actions>(new ActionsImpl());\n\nconst Button = () => {\n  const {\n    actions: { increment }\n  } = useContext();\n\n  return <button onClick={increment}>+</button>;\n};\n\nconst Display = () => {\n  const {\n    state: { count }\n  } = useContext();\n  return <>{count}</>;\n};\n\nexport const ClassBasedApp = () => (\n  <Provider value={{ count: 0 }}>\n    ClassBasedApp: <Button /> <Display />\n  </Provider>\n);\n");
+/* harmony default export */ __webpack_exports__["default"] = ("import React from 'react';\nimport { createTinyContext, ExternalActions } from '../../src/tiny-context';\n\ntype State = { count: number };\n\nclass ActionsImpl {\n  increment(state: State) {\n    return { ...state, count: state.count + 1 };\n  }\n}\n\nconst { Provider, useContext } = createTinyContext<State, ExternalActions<ActionsImpl>>(new ActionsImpl());\n\nconst Button = () => {\n  const {\n    actions: { increment }\n  } = useContext();\n\n  return <button onClick={increment}>+</button>;\n};\n\nconst Display = () => {\n  const {\n    state: { count }\n  } = useContext();\n  return <>{count}</>;\n};\n\nexport const ClassBasedApp = () => (\n  <Provider value={{ count: 0 }}>\n    ClassBasedApp: <Button /> <Display />\n  </Provider>\n);\n");
 
 /***/ }),
 
@@ -28899,7 +28901,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("import React from 'react';\nimport { wait } from '../wait';\nimport { createTinyContext, InternalActions } from '../../src/tiny-context';\n\ntype State = { count: number; lock: boolean };\ntype Actions = { setLock: (lock: boolean) => void; increment: () => Promise<void> };\n\nclass ActionsImpl implements InternalActions<State, Actions> {\n  setLock(state: State, lock: boolean) {\n    return { ...state, lock };\n  }\n  async *increment(state: State) {\n    state = yield this.setLock(state, true);\n\n    await wait(); // network delays...\n    state = yield { ...state, count: state.count + 1 };\n\n    return this.setLock(state, false);\n  }\n}\n\nconst { Provider, useContext } = createTinyContext<State, Actions>(new ActionsImpl());\n\nconst Button = () => {\n  const {\n    state: { lock },\n    actions: { increment }\n  } = useContext();\n\n  return (\n    <button disabled={lock} onClick={increment}>\n      +\n    </button>\n  );\n};\n\nconst Display = () => {\n  const {\n    state: { count }\n  } = useContext();\n  return <>{count}</>;\n};\n\nexport const GeneratorApp = () => (\n  <Provider value={{ count: 0, lock: false }}>\n    GeneratorApp: <Button /> <Display />\n  </Provider>\n);\n");
+/* harmony default export */ __webpack_exports__["default"] = ("import React from 'react';\nimport { wait } from '../wait';\nimport { createTinyContext, ExternalActions } from '../../src/tiny-context';\n\ntype State = { count: number; lock: boolean };\n\nclass Actions {\n  setLock(state: State, lock: boolean) {\n    return { ...state, lock };\n  }\n  async *increment(state: State) {\n    state = yield this.setLock(state, true);\n\n    await wait(); // network delays...\n    state = yield { ...state, count: state.count + 1 };\n\n    return this.setLock(state, false);\n  }\n}\n\nconst { Provider, useContext } = createTinyContext<State, ExternalActions<Actions>>(new Actions());\n\nconst Button = () => {\n  const {\n    state: { lock },\n    actions: { increment }\n  } = useContext();\n\n  return (\n    <button disabled={lock} onClick={increment}>\n      +\n    </button>\n  );\n};\n\nconst Display = () => {\n  const {\n    state: { count }\n  } = useContext();\n  return <>{count}</>;\n};\n\nexport const GeneratorApp = () => (\n  <Provider value={{ count: 0, lock: false }}>\n    GeneratorApp: <Button /> <Display />\n  </Provider>\n);\n");
 
 /***/ }),
 
@@ -28912,7 +28914,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("import React from 'react';\nimport { createTinyContext } from '../../src/tiny-context';\n\ntype State = { count: number };\ntype Actions = { increment: () => void };\n\nconst { Provider, useContext } = createTinyContext<State, Actions>({\n  increment: state => ({ ...state, count: state.count + 1 })\n});\n\nconst Button = () => {\n  const {\n    actions: { increment }\n  } = useContext();\n\n  return <button onClick={increment}>+</button>;\n};\n\nconst Display = () => {\n  const {\n    state: { count }\n  } = useContext();\n  return <>{count}</>;\n};\n\nexport const MinimumApp = () => (\n  <Provider value={{ count: 0 }}>\n    MinimumApp: <Button /> <Display />\n  </Provider>\n);\n");
+/* harmony default export */ __webpack_exports__["default"] = ("import React from 'react';\nimport { createTinyContext, ExternalActions } from '../../src/tiny-context';\n\ntype State = { count: number };\n\nconst actions = {\n  increment: (state: State) => ({ ...state, count: state.count + 1 })\n};\n\nconst { Provider, useContext } = createTinyContext<State, ExternalActions<typeof actions>>(actions);\n\nconst Button = () => {\n  const {\n    actions: { increment }\n  } = useContext();\n\n  return <button onClick={increment}>+</button>;\n};\n\nconst Display = () => {\n  const {\n    state: { count }\n  } = useContext();\n  return <>{count}</>;\n};\n\nexport const MinimumApp = () => (\n  <Provider value={{ count: 0 }}>\n    MinimumApp: <Button /> <Display />\n  </Provider>\n);\n");
 
 /***/ }),
 
@@ -28964,7 +28966,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("import React from 'react';\nimport { wait } from '../wait';\nimport { createTinyContext, InternalActions } from '../../src/tiny-context';\n\nexport interface Todo {\n  text: string;\n  completed: boolean;\n}\n\nexport interface TodoState {\n  todos: Todo[];\n  progress: boolean;\n}\n\nexport interface TodoActions {\n  showProgress: () => void;\n  hideProgress: () => void;\n  add: (todo: Todo) => Promise<void>;\n  update: (index: number, todo: Todo) => Promise<void>;\n}\n\nclass ActionImpl implements InternalActions<TodoState, TodoActions> {\n  showProgress(state: TodoState) {\n    return { ...state, progress: true };\n  }\n\n  hideProgress(state: TodoState) {\n    return { ...state, progress: false };\n  }\n\n  async *add(state: TodoState, todo: Todo) {\n    state = yield this.showProgress(state);\n\n    await wait(); // network delays...\n    const todos = [...state.todos, todo];\n    state = yield { ...state, todos };\n\n    return this.hideProgress(state);\n  }\n\n  async update(state: TodoState, index: number, todo: Todo) {\n    await wait(); // network delays...\n    const todos = [...state.todos];\n    todos[index] = todo;\n    return { ...state, todos };\n  }\n}\n\nconst { Provider, useContext } = createTinyContext<TodoState, TodoActions>(new ActionImpl());\n\nexport const useTodoContext = useContext;\n\nexport const TodoProvider = ({ children }: { children: React.ReactNode }): JSX.Element => {\n  return <Provider value={{ todos: [], progress: false }}>{children}</Provider>;\n};\n");
+/* harmony default export */ __webpack_exports__["default"] = ("import React from 'react';\nimport { wait } from '../wait';\nimport { createTinyContext, ExternalActions } from '../../src/tiny-context';\n\nexport interface Todo {\n  text: string;\n  completed: boolean;\n}\n\nexport interface TodoState {\n  todos: Todo[];\n  progress: boolean;\n}\n\nclass Actions {\n  showProgress(state: TodoState) {\n    return { ...state, progress: true };\n  }\n\n  hideProgress(state: TodoState) {\n    return { ...state, progress: false };\n  }\n\n  async *add(state: TodoState, todo: Todo) {\n    state = yield this.showProgress(state);\n\n    await wait(); // network delays...\n    const todos = [...state.todos, todo];\n    state = yield { ...state, todos };\n\n    return this.hideProgress(state);\n  }\n\n  async update(state: TodoState, index: number, todo: Todo) {\n    await wait(); // network delays...\n    const todos = [...state.todos];\n    todos[index] = todo;\n    return { ...state, todos };\n  }\n}\n\nconst { Provider, useContext } = createTinyContext<TodoState, ExternalActions<Actions>>(new Actions());\n\nexport const useTodoContext = useContext;\n\nexport const TodoProvider = ({ children }: { children: React.ReactNode }) => (\n  <Provider value={{ todos: [], progress: false }}>{children}</Provider>\n);\n");
 
 /***/ }),
 

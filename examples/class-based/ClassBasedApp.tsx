@@ -1,16 +1,15 @@
 import React from 'react';
-import { createTinyContext, InternalActions } from '../../src/tiny-context';
+import { createTinyContext, ExternalActions } from '../../src/tiny-context';
 
 type State = { count: number };
-type Actions = { increment: () => void };
 
-class ActionsImpl implements InternalActions<State, Actions> {
+class ActionsImpl {
   increment(state: State) {
     return { ...state, count: state.count + 1 };
   }
 }
 
-const { Provider, useContext } = createTinyContext<State, Actions>(new ActionsImpl());
+const { Provider, useContext } = createTinyContext<State, ExternalActions<ActionsImpl>>(new ActionsImpl());
 
 const Button = () => {
   const {

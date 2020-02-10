@@ -1,6 +1,6 @@
 import React from 'react';
 import { wait } from '../wait';
-import { createTinyContext, InternalActions } from '../../src/tiny-context';
+import { createTinyContext, ExternalActions } from '../../src/tiny-context';
 
 export interface Todo {
   text: string;
@@ -12,14 +12,7 @@ export interface TodoState {
   progress: boolean;
 }
 
-export interface TodoActions {
-  showProgress: () => void;
-  hideProgress: () => void;
-  add: (todo: Todo) => Promise<void>;
-  update: (index: number, todo: Todo) => Promise<void>;
-}
-
-class ActionImpl implements InternalActions<TodoState, TodoActions> {
+class Actions {
   showProgress(state: TodoState) {
     return { ...state, progress: true };
   }
@@ -46,7 +39,7 @@ class ActionImpl implements InternalActions<TodoState, TodoActions> {
   }
 }
 
-const { Provider, useContext } = createTinyContext<TodoState, TodoActions>(new ActionImpl());
+const { Provider, useContext } = createTinyContext<TodoState, ExternalActions<Actions>>(new Actions());
 
 export const useTodoContext = useContext;
 

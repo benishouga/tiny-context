@@ -26,15 +26,15 @@ This library wraps the React Context API and supports creating contexts with `{ 
    ```ts
    type CounterState = { count: number };
    ```
-2. Define actions external interface.
+2. Define actions that takes state as the first argument and returns state.
    ```ts
-   type CounterActions = { increment: () => void };
+   const actions = {
+     increment: (state: CounterState) => ({ ...state, count: state.count + 1 })
+   };
    ```
-3. Define actions that takes state as the first argument and returns state.
+3. Create Provider and useContext from actions. Specify the State and the ExternalActions interface for the type argument. ExternalActions can be generated from Actions implementations.
    ```ts
-   const { Provider, useContext } = createTinyContext<CounterState, CounterActions>({
-     increment: state => ({ count: state.count + 1 })
-   });
+   const { Provider, useContext } = createTinyContext<CounterState, ExternalActions<typeof actions>>(actions);
    ```
 4. Can be used like the Context API :)
 
@@ -68,27 +68,21 @@ https://benishouga.github.io/tiny-context/
 
 ## API
 
-### type InternalActions
-
-```ts
-import { InternalActions } from 'tiny-context';
-
-type SomeInternalActions = InternalActions<State, Actions>;
-```
-
-Given `State` and `Actions` interface, get a `InternalActions` interface.
-
-`Actions` methods must return a `Promise<void>`. (Although `void` can be specified, `Promise<void>` is actually returned.)
-
-`InternalActions` methods require the first argument to be `State` and the return value to be `State` (or [`Promise`, `Generator`](https://benishouga.github.io/tiny-context/)). The second and subsequent arguments are the same as for `Actions`.
-
 ### createTinyContext
 
-```ts
-import { createTinyContext, InternalActions } from 'tiny-context';
+Create Provider and useContext from Actions implementations. Actions implementation methods require the first argument to be `State` and the return value to be `State` (or [`Promise`, `Generator`](https://benishouga.github.io/tiny-context/)).
 
-class SomeActionImpl implements InternalActions<State, Actions> { ... }
-const { Provider, useContext } = createTinyContext<State, Actions>(new SomeActionImpl());
+Specify the `State` and the `ExternalActions` interface for the type argument. `ExternalActions` can be generated from Actions implementations. The second and subsequent arguments are carried over to the `ExternalActions`. `ExternalActions` methods must return a `Promise<void>`.
+
+```ts
+import { createTinyContext, ExternalActions } from 'tiny-context';
+
+type CounterState = { count: number; };
+class CounterActions {
+  increment: (state: CounterState, amount: number) => ({ ...state, count: state.count + amount })
+  decrement: (state: CounterState, amount: number) => ({ ...state, count: state.count - amount })
+}
+const { Provider, useContext } = createTinyContext<CounterState, ExternalActions<CounterActions>>(new CounterActions());
 ```
 
 `Provider` is same as [`Provider of React`](https://reactjs.org/docs/context.html#contextprovider).
@@ -111,6 +105,26 @@ const SomeConsumer = () => {
   } = useContext();
 
 };
+```
+
+### type ExternalActions
+
+Given `InternalActions` interface, get a `ExternalActions` interface. Used to derive an `ExternalActions` when the Actions implementations is defined first.
+
+```ts
+import { ExternalActions } from 'tiny-context';
+
+type SomExternalActions = ExternalActions<SomeActions>;
+```
+
+### type InternalActions
+
+Given `State` and `Actions` interface, get a `InternalActions` interface. Used to derive the `InternalActions` when the `ExternalActions` is defined first.
+
+```ts
+import { InternalActions } from 'tiny-context';
+
+type SomeInternalActions = InternalActions<State, Actions>;
 ```
 
 ## Limitation

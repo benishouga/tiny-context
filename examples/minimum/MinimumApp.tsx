@@ -1,12 +1,13 @@
 import React from 'react';
-import { createTinyContext } from '../../src/tiny-context';
+import { createTinyContext, ExternalActions } from '../../src/tiny-context';
 
 type State = { count: number };
-type Actions = { increment: () => void };
 
-const { Provider, useContext } = createTinyContext<State, Actions>({
-  increment: state => ({ ...state, count: state.count + 1 })
-});
+const actions = {
+  increment: (state: State) => ({ ...state, count: state.count + 1 })
+};
+
+const { Provider, useContext } = createTinyContext<State, ExternalActions<typeof actions>>(actions);
 
 const Button = () => {
   const {

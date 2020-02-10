@@ -1,17 +1,18 @@
 import React from 'react';
 import { wait } from '../wait';
-import { createTinyContext } from '../../src/tiny-context';
+import { createTinyContext, ExternalActions } from '../../src/tiny-context';
 
 type State = { count: number; lock: boolean };
-type Actions = { setLock: (lock: boolean) => void; increment: () => Promise<void> };
 
-const { Provider, useContext } = createTinyContext<State, Actions>({
-  setLock: (state, lock) => ({ ...state, lock }),
-  increment: async state => {
+const actions = {
+  setLock: (state: State, lock: boolean) => ({ ...state, lock }),
+  increment: async (state: State) => {
     await wait(); // network delays...
     return { ...state, count: state.count + 1 };
   }
-});
+};
+
+const { Provider, useContext } = createTinyContext<State, ExternalActions<typeof actions>>(actions);
 
 const Button = () => {
   const {

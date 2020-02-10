@@ -1,11 +1,10 @@
 import React from 'react';
 import { wait } from '../wait';
-import { createTinyContext, InternalActions } from '../../src/tiny-context';
+import { createTinyContext, ExternalActions } from '../../src/tiny-context';
 
 type State = { count: number; lock: boolean };
-type Actions = { setLock: (lock: boolean) => void; increment: () => Promise<void> };
 
-class ActionsImpl implements InternalActions<State, Actions> {
+class Actions {
   setLock(state: State, lock: boolean) {
     return { ...state, lock };
   }
@@ -19,7 +18,7 @@ class ActionsImpl implements InternalActions<State, Actions> {
   }
 }
 
-const { Provider, useContext } = createTinyContext<State, Actions>(new ActionsImpl());
+const { Provider, useContext } = createTinyContext<State, ExternalActions<Actions>>(new Actions());
 
 const Button = () => {
   const {
