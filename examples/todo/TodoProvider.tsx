@@ -50,6 +50,6 @@ const { Provider, useContext } = createTinyContext<TodoState, TodoActions>(new A
 
 export const useTodoContext = useContext;
 
-export const TodoProvider = ({ children }: { children: React.ReactNode }): JSX.Element => {
-  return <Provider value={{ todos: [], progress: false }}>{children}</Provider>;
-};
+export const TodoProvider = ({ children }: { children: React.ReactNode }) => (
+  <Provider value={{ todos: [], progress: false }}>{children}</Provider>
+);
