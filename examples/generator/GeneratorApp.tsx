@@ -1,6 +1,6 @@
 import React from 'react';
 import { wait } from '../wait';
-import { createTinyContext, ExternalActions } from '../../src/tiny-context';
+import { createTinyContext } from '../../src/tiny-context';
 
 type State = { count: number; lock: boolean };
 
@@ -8,17 +8,17 @@ class Actions {
   setLock(state: State, lock: boolean) {
     return { ...state, lock };
   }
-  async *increment(state: State) {
+  async *increment(state: State, amount: number) {
     state = yield this.setLock(state, true);
 
     await wait(); // network delays...
-    state = yield { ...state, count: state.count + 1 };
+    state = yield { ...state, count: state.count + amount };
 
     return this.setLock(state, false);
   }
 }
 
-const { Provider, useContext } = createTinyContext<State, ExternalActions<Actions>>(new Actions());
+const { Provider, useContext } = createTinyContext<State, Actions>(new Actions());
 
 const Button = () => {
   const {
@@ -27,7 +27,7 @@ const Button = () => {
   } = useContext();
 
   return (
-    <button disabled={lock} onClick={increment}>
+    <button disabled={lock} onClick={() => increment(1)}>
       +
     </button>
   );

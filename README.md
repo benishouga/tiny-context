@@ -22,19 +22,25 @@ This library wraps the React Context API and supports creating contexts with `{ 
 
 ## Steps to use
 
-1. Define state.
+1. Define `State`.
    ```ts
    type CounterState = { count: number };
    ```
-2. Define actions that takes state as the first argument and returns state.
+2. Define `actions` that takes `State` as the first argument and returns `State`. `actions` can also be created on a [class-base](https://benishouga.github.io/tiny-context/).
    ```ts
    const actions = {
-     increment: (state: CounterState) => ({ ...state, count: state.count + 1 })
+     increment: (state: CounterState, amount: number) => ({ ...state, count: state.count + amount })
    };
    ```
-3. Create Provider and useContext from actions. Specify the State and the ExternalActions interface for the type argument. ExternalActions can be generated from Actions implementations.
+3. Create `Provider` and `useContext` from `actions`. Specify the `State` and `actions` for the type argument.
    ```ts
-   const { Provider, useContext } = createTinyContext<CounterState, ExternalActions<typeof actions>>(actions);
+   const { Provider, useContext } = createTinyContext<CounterState, typeof actions>(actions);
+   ```
+   (option) If you use the `actions` method, you only need to specify `State` type argument.
+   ```ts
+   const { Provider, useContext } = createTinyContext<CounterState>().actions({
+     increment: (state, amount: number) => ({ ...state, count: state.count + amount })
+   });
    ```
 4. Can be used like the Context API :)
 
@@ -72,7 +78,7 @@ https://benishouga.github.io/tiny-context/
 
 Create Provider and useContext from Actions implementations. Actions implementation methods require the first argument to be `State` and the return value to be `State` (or [`Promise`, `Generator`](https://benishouga.github.io/tiny-context/)).
 
-Specify the `State` and the `ExternalActions` interface for the type argument. `ExternalActions` can be generated from Actions implementations. The second and subsequent arguments are carried over to the `ExternalActions`. `ExternalActions` methods must return a `Promise<void>`.
+Specify the `State` and the `Actions` interface for the type argument.
 
 ```ts
 import { createTinyContext, ExternalActions } from 'tiny-context';
@@ -82,20 +88,27 @@ class CounterActions {
   increment: (state: CounterState, amount: number) => ({ ...state, count: state.count + amount })
   decrement: (state: CounterState, amount: number) => ({ ...state, count: state.count - amount })
 }
-const { Provider, useContext } = createTinyContext<CounterState, ExternalActions<CounterActions>>(new CounterActions());
+const { Provider, useContext } = createTinyContext<CounterState, CounterActions>(new CounterActions());
+
+// If use the `actions` method
+const { Provider, useContext } = createTinyContext<CounterState>().actions(new CounterActions());
 ```
 
 `Provider` is same as [`Provider of React`](https://reactjs.org/docs/context.html#contextprovider).
 
+Supply an initial value for `value`.
+
 ```tsx
 const SomeApp = () => (
-  <Provider value={{...}}>
+  <Provider value={{ count: 0 }}>
     <SomeConsumer />
   </Provider>
 );
 ```
 
-`useContext` is hooks used on a consumer. Not need arguments.
+`useContext` is hooks used on a consumer. Not need arguments. You will get an object with a State and a function that calls the Actions defined earlier.
+
+Function arguments are inherited from the second and subsequent arguments of the previously defined Action. The return value is a uniform `Promise<void>`.
 
 ```tsx
 const SomeConsumer = () => {
@@ -105,26 +118,6 @@ const SomeConsumer = () => {
   } = useContext();
 
 };
-```
-
-### type ExternalActions
-
-Given `InternalActions` interface, get a `ExternalActions` interface. Used to derive an `ExternalActions` when the Actions implementations is defined first.
-
-```ts
-import { ExternalActions } from 'tiny-context';
-
-type SomExternalActions = ExternalActions<SomeActions>;
-```
-
-### type InternalActions
-
-Given `State` and `Actions` interface, get a `InternalActions` interface. Used to derive the `InternalActions` when the `ExternalActions` is defined first.
-
-```ts
-import { InternalActions } from 'tiny-context';
-
-type SomeInternalActions = InternalActions<State, Actions>;
 ```
 
 ## Limitation

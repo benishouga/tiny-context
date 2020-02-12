@@ -1,30 +1,29 @@
-import React from 'react';
-declare type Action = (...args: any) => void | Promise<void>;
-declare type Actions<A> = {
-    [P in keyof A]: Action;
+import { PropsWithChildren, FC } from 'react';
+declare type Result<S> = void | S | Promise<void> | Promise<S>;
+declare type GeneratorResult<S> = Generator<Result<S>, Result<S>, S> | AsyncGenerator<Result<S>, Result<S>, S>;
+declare type ImplResult<S> = Result<S> | GeneratorResult<S>;
+declare type Imple<S, A> = {
+    [P in keyof A]: (s: S, ...args: any) => ImplResult<S>;
+};
+declare type ToExternalParameter<T> = T extends (s: any, ...args: infer P) => any ? P : never;
+declare type Externals<A> = {
+    [P in keyof A]: (...args: ToExternalParameter<A[P]>) => void | Promise<void>;
 };
 declare type ContextState<S, A> = {
     state: S;
-    actions: A;
+    actions: Externals<A>;
 };
-declare type ActionResult<S> = void | S | Promise<void> | Promise<S>;
-declare type GeneratorResult<S> = Generator<ActionResult<S>, ActionResult<S>, S> | AsyncGenerator<ActionResult<S>, ActionResult<S>, S>;
-declare type InternalActionResult<S> = ActionResult<S> | GeneratorResult<S>;
-export declare type InternalActions<S, A extends Actions<A>> = {
-    [P in keyof A]: (state: S, ...args: Parameters<A[P]>) => InternalActionResult<S>;
-};
-declare type ExcludeFirstParameters<T extends (...args: any) => any> = T extends (s: any, ...args: infer P) => any ? P : never;
-export declare type ExternalActions<A extends {
-    [P in keyof A]: (...args: any) => any;
-}> = {
-    [P in keyof A]: (...args: ExcludeFirstParameters<A[P]>) => void | Promise<void>;
-};
-export declare function createStore<S, A extends Actions<A>>(value: S, onStateChanged: (s: S) => void, actions: InternalActions<S, A>): () => ContextState<S, A>;
-export declare function createTinyContext<S, A extends Actions<A>>(internalActions: InternalActions<S, A>): {
-    Provider: ({ value, children }: {
+export declare function createStore<S, A extends Imple<S, A>>(value: S, onChanged: (s: S) => void, actions: A): () => ContextState<S, A>;
+declare type CreateResult<S, A> = {
+    Provider: FC<PropsWithChildren<{
         value: S;
-        children: React.ReactNode;
-    }) => JSX.Element;
+    }>>;
     useContext: () => ContextState<S, A>;
 };
+declare type Fluent<S> = {
+    actions: <A extends Imple<S, A>>(impl: A) => CreateResult<S, A>;
+};
+declare function _createTinyContext<S>(): Fluent<S>;
+declare function _createTinyContext<S, A extends Imple<S, A>>(impl: A): CreateResult<S, A>;
+export declare const createTinyContext: typeof _createTinyContext;
 export {};

@@ -2,23 +2,22 @@ import '@testing-library/jest-dom/extend-expect';
 import React from 'react';
 import { render, fireEvent, screen, wait, waitForElement } from '@testing-library/react';
 
-import { createTinyContext, InternalActions } from '../src/tiny-context';
+import { createTinyContext } from '../src/tiny-context';
 
 const wait10 = async () => new Promise(resolve => setTimeout(resolve, 10));
 
 describe('tiny-context', () => {
   describe('simple actions', () => {
     type State = { count: number };
-    type Actions = { increment: () => void; doNothing: () => void };
-    const { Provider, useContext } = createTinyContext<State, Actions>({
-      increment: state => ({ count: state.count + 1 }),
+    const { Provider, useContext } = createTinyContext<State>().actions({
+      increment: (state, amount: number) => ({ count: state.count + amount }),
       doNothing: () => {}
     });
     const IncrementButton = () => {
       const {
         actions: { increment }
       } = useContext();
-      return <button onClick={increment}>button</button>;
+      return <button onClick={() => increment(1)}>button</button>;
     };
     const TwiceButton = () => {
       const {
@@ -27,8 +26,8 @@ describe('tiny-context', () => {
       return (
         <button
           onClick={() => {
-            increment();
-            increment();
+            increment(1);
+            increment(1);
           }}
         >
           button
@@ -106,51 +105,49 @@ describe('tiny-context', () => {
       await wait();
       expect(screen.getByText('count is 0')).toBeInTheDocument();
     });
+
+    test('Provider does not throw an error if no children.', async () => {
+      render(<Provider value={{ count: 0 }} />);
+    });
   });
 
   describe('class based actions', () => {
     type State = { count: number };
-    type Actions = {
-      increment: () => Promise<void>;
-      asyncIncrement: () => Promise<void>;
-      publicIncrement: () => Promise<void>;
-      throwException: () => Promise<void>;
-    };
-    class Impl implements InternalActions<State, Actions> {
-      increment(state: State) {
-        return { count: state.count + 1 };
+    class Actions {
+      increment(state: State, amount: number) {
+        return { count: state.count + amount };
       }
-      async asyncIncrement(state: State) {
-        return { count: state.count + 1 };
+      async asyncIncrement(state: State, amount: number) {
+        return { count: state.count + amount };
       }
-      publicIncrement(state: State) {
-        return this.privateIncrement(state);
+      publicIncrement(state: State, amount: number) {
+        return this.privateIncrement(state, amount);
       }
-      privateIncrement(state: State) {
-        return { count: state.count + 1 };
+      privateIncrement(state: State, amount: number) {
+        return { count: state.count + amount };
       }
       throwException() {
         throw new Error('hoge');
       }
     }
-    const { Provider, useContext } = createTinyContext<State, Actions>(new Impl());
+    const { Provider, useContext } = createTinyContext<State, Actions>(new Actions());
     const IncrementButton = () => {
       const {
         actions: { increment }
       } = useContext();
-      return <button onClick={increment}>button</button>;
+      return <button onClick={() => increment(1)}>button</button>;
     };
     const AsyncIncrementButton = () => {
       const {
         actions: { asyncIncrement }
       } = useContext();
-      return <button onClick={asyncIncrement}>button</button>;
+      return <button onClick={() => asyncIncrement(1)}>button</button>;
     };
     const RefThisButton = () => {
       const {
         actions: { publicIncrement }
       } = useContext();
-      return <button onClick={publicIncrement}>button</button>;
+      return <button onClick={() => publicIncrement(1)}>button</button>;
     };
     const ExceptionButton = () => {
       const {
@@ -162,7 +159,7 @@ describe('tiny-context', () => {
             try {
               await throwException();
             } catch {
-              increment();
+              increment(1);
             }
           }}
         >
@@ -231,18 +228,17 @@ describe('tiny-context', () => {
   });
   describe('async actions', () => {
     type State = { count: number };
-    type Actions = { increment: () => void };
-    const { Provider, useContext } = createTinyContext<State, Actions>({
-      increment: async state => {
+    const { Provider, useContext } = createTinyContext<State>().actions({
+      increment: async (state, amount: number) => {
         await wait10(); // wait for event loop
-        return { count: state.count + 1 };
+        return { count: state.count + amount };
       }
     });
     const IncrementButton = () => {
       const {
         actions: { increment }
       } = useContext();
-      return <button onClick={increment}>button</button>;
+      return <button onClick={() => increment(1)}>button</button>;
     };
     const Display = () => {
       const {
@@ -281,22 +277,21 @@ describe('tiny-context', () => {
 
   describe('generator actions', () => {
     type State = { count: number };
-    type Actions = { iiincrement: () => void };
-    const { Provider, useContext } = createTinyContext<State, Actions>({
-      iiincrement: async function*(state) {
+    const { Provider, useContext } = createTinyContext<State>().actions({
+      iiincrement: async function*(state, amount: number) {
         await wait10();
-        state = yield { ...state, count: state.count + 1 };
+        state = yield { ...state, count: state.count + amount };
         await wait10();
-        state = yield { ...state, count: state.count + 1 };
+        state = yield { ...state, count: state.count + amount };
         await wait10();
-        return { ...state, count: state.count + 1 };
+        return { ...state, count: state.count + amount };
       }
     });
     const IncrementButton = () => {
       const {
         actions: { iiincrement }
       } = useContext();
-      return <button onClick={iiincrement}>button</button>;
+      return <button onClick={() => iiincrement(1)}>button</button>;
     };
     const Display = () => {
       const {

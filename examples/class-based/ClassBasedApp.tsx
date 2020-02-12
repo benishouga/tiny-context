@@ -1,22 +1,22 @@
 import React from 'react';
-import { createTinyContext, ExternalActions } from '../../src/tiny-context';
+import { createTinyContext } from '../../src/tiny-context';
 
 type State = { count: number };
 
-class ActionsImpl {
-  increment(state: State) {
-    return { ...state, count: state.count + 1 };
+class Actions {
+  increment(state: State, amount: number) {
+    return { ...state, count: state.count + amount };
   }
 }
 
-const { Provider, useContext } = createTinyContext<State, ExternalActions<ActionsImpl>>(new ActionsImpl());
+const { Provider, useContext } = createTinyContext<State, Actions>(new Actions());
 
 const Button = () => {
   const {
     actions: { increment }
   } = useContext();
 
-  return <button onClick={increment}>+</button>;
+  return <button onClick={() => increment(1)}>+</button>;
 };
 
 const Display = () => {

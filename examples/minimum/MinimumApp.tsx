@@ -1,20 +1,18 @@
 import React from 'react';
-import { createTinyContext, ExternalActions } from '../../src/tiny-context';
+import { createTinyContext } from '../../src/tiny-context';
 
 type State = { count: number };
 
-const actions = {
-  increment: (state: State) => ({ ...state, count: state.count + 1 })
-};
-
-const { Provider, useContext } = createTinyContext<State, ExternalActions<typeof actions>>(actions);
+const { Provider, useContext } = createTinyContext<State>().actions({
+  increment: (state, amount: number) => ({ ...state, count: state.count + amount })
+});
 
 const Button = () => {
   const {
     actions: { increment }
   } = useContext();
 
-  return <button onClick={increment}>+</button>;
+  return <button onClick={() => increment(1)}>+</button>;
 };
 
 const Display = () => {

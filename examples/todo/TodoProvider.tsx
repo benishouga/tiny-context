@@ -1,6 +1,6 @@
 import React from 'react';
 import { wait } from '../wait';
-import { createTinyContext, ExternalActions } from '../../src/tiny-context';
+import { createTinyContext } from '../../src/tiny-context';
 
 export interface Todo {
   text: string;
@@ -39,7 +39,7 @@ class Actions {
   }
 }
 
-const { Provider, useContext } = createTinyContext<TodoState, ExternalActions<Actions>>(new Actions());
+const { Provider, useContext } = createTinyContext<TodoState>().actions(new Actions());
 
 export const useTodoContext = useContext;
 
