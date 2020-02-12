@@ -99,7 +99,7 @@ export function createStore(value, onChanged, actions) {
     var queue = new Queue();
     var feed = function (newState) {
         if (newState !== null && newState !== undefined) {
-            state = __assign({}, newState);
+            state = __assign(__assign({}, state), newState);
             onChanged(state);
         }
     };
@@ -109,29 +109,29 @@ export function createStore(value, onChanged, actions) {
             args[_i] = arguments[_i];
         }
         var task = function () { return __awaiter(_this, void 0, void 0, function () {
-            var actionResult, result, _a;
+            var result, next, _a;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0: return [4 /*yield*/, action.bind(actions).apply(void 0, __spreadArrays([state], args))];
                     case 1:
-                        actionResult = _b.sent();
-                        if (!isGenerator(actionResult)) return [3 /*break*/, 6];
+                        result = _b.sent();
+                        if (!isGenerator(result)) return [3 /*break*/, 6];
                         _b.label = 2;
                     case 2:
                         if (!true) return [3 /*break*/, 5];
-                        return [4 /*yield*/, actionResult.next(state)];
+                        return [4 /*yield*/, result.next(state)];
                     case 3:
-                        result = _b.sent();
+                        next = _b.sent();
                         _a = feed;
-                        return [4 /*yield*/, result.value];
+                        return [4 /*yield*/, next.value];
                     case 4:
                         _a.apply(void 0, [_b.sent()]);
-                        if (result.done)
+                        if (next.done)
                             return [3 /*break*/, 5];
                         return [3 /*break*/, 2];
                     case 5: return [3 /*break*/, 7];
                     case 6:
-                        feed(actionResult);
+                        feed(result);
                         _b.label = 7;
                     case 7: return [2 /*return*/];
                 }

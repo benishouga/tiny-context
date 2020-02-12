@@ -76,7 +76,7 @@ https://benishouga.github.io/tiny-context/
 
 ### createTinyContext
 
-Create Provider and useContext from Actions implementations. Actions implementation methods require the first argument to be `State` and the return value to be `State` (or [`Promise`, `Generator`](https://benishouga.github.io/tiny-context/)).
+Create Provider and useContext from Actions implementations. Actions implementation methods require the first argument to be `State` and the return value to be `State` (or `Partial<State>`, [`Promise`, `Generator`](https://benishouga.github.io/tiny-context/)).
 
 Specify the `State` and the `Actions` interface for the type argument.
 

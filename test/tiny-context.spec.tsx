@@ -8,9 +8,10 @@ const wait10 = async () => new Promise(resolve => setTimeout(resolve, 10));
 
 describe('tiny-context', () => {
   describe('simple actions', () => {
-    type State = { count: number };
+    type State = { count: number; flag: boolean };
     const { Provider, useContext } = createTinyContext<State>().actions({
       increment: (state, amount: number) => ({ count: state.count + amount }),
+      toggle: state => ({ flag: !state.flag }),
       doNothing: () => {}
     });
     const IncrementButton = () => {
@@ -40,11 +41,22 @@ describe('tiny-context', () => {
       } = useContext();
       return <button onClick={doNothing}>button</button>;
     };
+    const ToggleButton = () => {
+      const {
+        actions: { toggle }
+      } = useContext();
+      return <button onClick={toggle}>button</button>;
+    };
     const Display = () => {
       const {
-        state: { count }
+        state: { count, flag }
       } = useContext();
-      return <>count is {count}</>;
+      return (
+        <>
+          <p>count is {count}</p>
+          <p>flag is {String(flag)}</p>
+        </>
+      );
     };
 
     test('createTinyContext can create a Provider and useContext instance.', () => {
@@ -55,7 +67,7 @@ describe('tiny-context', () => {
 
     test('Update the State using an action.', async () => {
       render(
-        <Provider value={{ count: 0 }}>
+        <Provider value={{ count: 0, flag: false }}>
           <IncrementButton />
           <Display />
         </Provider>
@@ -68,7 +80,7 @@ describe('tiny-context', () => {
 
     test('Action is executed sequentially when double-clicked.', async () => {
       render(
-        <Provider value={{ count: 0 }}>
+        <Provider value={{ count: 0, flag: false }}>
           <IncrementButton />
           <Display />
         </Provider>
@@ -82,7 +94,7 @@ describe('tiny-context', () => {
 
     test('Action is executed sequentially when the action is called twice on the same event loop.', async () => {
       render(
-        <Provider value={{ count: 0 }}>
+        <Provider value={{ count: 0, flag: false }}>
           <TwiceButton />
           <Display />
         </Provider>
@@ -95,7 +107,7 @@ describe('tiny-context', () => {
 
     test('If the Action does not return anything, it does not update the state.', async () => {
       render(
-        <Provider value={{ count: 0 }}>
+        <Provider value={{ count: 0, flag: false }}>
           <DoNothingButton />
           <Display />
         </Provider>
@@ -107,7 +119,22 @@ describe('tiny-context', () => {
     });
 
     test('Provider does not throw an error if no children.', async () => {
-      render(<Provider value={{ count: 0 }} />);
+      render(<Provider value={{ count: 0, flag: false }} />);
+    });
+
+    test('Partial state specification works.', async () => {
+      render(
+        <Provider value={{ count: 0, flag: false }}>
+          <ToggleButton />
+          <Display />
+        </Provider>
+      );
+      expect(screen.getByText('count is 0')).toBeInTheDocument();
+      expect(screen.getByText('flag is false')).toBeInTheDocument();
+      fireEvent.click(screen.getByText('button'));
+      await waitForElement(() => screen.getByText('flag is true'));
+      expect(screen.getByText('count is 0')).toBeInTheDocument();
+      expect(screen.getByText('flag is true')).toBeInTheDocument();
     });
   });
 

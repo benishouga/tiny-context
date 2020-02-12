@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useState, useMemo, PropsWithChildren, FC } from 'react';
 
-type Result<S> = void | S | Promise<void> | Promise<S>;
+type Result<S> = void | Partial<S> | Promise<void> | Promise<Partial<S>>;
 type GeneratorResult<S> = Generator<Result<S>, Result<S>, S> | AsyncGenerator<Result<S>, Result<S>, S>;
 type ImplResult<S> = Result<S> | GeneratorResult<S>;
 
-type Imple<S, A> = {
+type Impl<S, A> = {
   [P in keyof A]: (s: S, ...args: any) => ImplResult<S>;
 };
 
@@ -56,7 +56,7 @@ const useRerender = () => {
   return { rerender: () => set(c => c + 1) };
 };
 
-export function createStore<S, A extends Imple<S, A>>(
+export function createStore<S, A extends Impl<S, A>>(
   value: S,
   onChanged: (s: S) => void,
   actions: A
@@ -64,24 +64,24 @@ export function createStore<S, A extends Imple<S, A>>(
   let state: S = value;
   const queue = new Queue();
 
-  const feed = (newState: void | S) => {
+  const feed = (newState: void | Partial<S>) => {
     if (newState !== null && newState !== undefined) {
-      state = { ...newState };
+      state = { ...state, ...newState };
       onChanged(state);
     }
   };
 
   const convertAction = (action: (state: S, ...args: any) => ImplResult<S>) => (...args: any) => {
     const task = async () => {
-      const actionResult = await action.bind(actions)(state, ...args);
-      if (isGenerator<Result<S>>(actionResult)) {
+      const result = await action.bind(actions)(state, ...args);
+      if (isGenerator<Result<S>>(result)) {
         while (true) {
-          const result = await actionResult.next(state);
-          feed(await result.value);
-          if (result.done) break;
+          const next = await result.next(state);
+          feed(await next.value);
+          if (next.done) break;
         }
       } else {
-        feed(actionResult);
+        feed(result);
       }
     };
 
@@ -109,18 +109,18 @@ type CreateResult<S, A> = {
 };
 
 type Fluent<S> = {
-  actions: <A extends Imple<S, A>>(impl: A) => CreateResult<S, A>;
+  actions: <A extends Impl<S, A>>(impl: A) => CreateResult<S, A>;
 };
 
 function _createTinyContext<S>(): Fluent<S>;
-function _createTinyContext<S, A extends Imple<S, A>>(impl: A): CreateResult<S, A>;
-function _createTinyContext<S, A extends Imple<S, A>>(impl?: A): CreateResult<S, A> | Fluent<S> {
+function _createTinyContext<S, A extends Impl<S, A>>(impl: A): CreateResult<S, A>;
+function _createTinyContext<S, A extends Impl<S, A>>(impl?: A): CreateResult<S, A> | Fluent<S> {
   if (impl) {
     return createTinyContext<S>().actions(impl);
   }
 
   return {
-    actions: function<A extends Imple<S, A>>(implementation: A) {
+    actions: function<A extends Impl<S, A>>(implementation: A) {
       const Context = createContext<ContextState<S, A>>({} as any);
 
       const Provider = ({ value, children = null }: PropsWithChildren<{ value: S }>) => {
