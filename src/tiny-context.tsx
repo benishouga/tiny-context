@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useMemo, PropsWithChildren, FC } from 'react';
 
-type Result<S> = void | Partial<S> | Promise<void> | Promise<Partial<S>>;
+type Result<S> = void | S | Promise<void> | Promise<S>;
 type GeneratorResult<S> = Generator<Result<S>, Result<S>, S> | AsyncGenerator<Result<S>, Result<S>, S>;
 type ImplResult<S> = Result<S> | GeneratorResult<S>;
 
@@ -64,9 +64,9 @@ export function createStore<S, A extends Impl<S, A>>(
   let state: S = value;
   const queue = new Queue();
 
-  const feed = (newState: void | Partial<S>) => {
+  const feed = (newState: void | S) => {
     if (newState !== null && newState !== undefined) {
-      state = { ...state, ...newState };
+      state = { ...newState };
       onChanged(state);
     }
   };

@@ -82500,7 +82500,7 @@ function createStore(value, onChanged, actions) {
     var queue = new Queue();
     var feed = function (newState) {
         if (newState !== null && newState !== undefined) {
-            state = __assign(__assign({}, state), newState);
+            state = __assign({}, newState);
             onChanged(state);
         }
     };

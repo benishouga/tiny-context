@@ -1,5 +1,5 @@
 import { PropsWithChildren, FC } from 'react';
-declare type Result<S> = void | Partial<S> | Promise<void> | Promise<Partial<S>>;
+declare type Result<S> = void | S | Promise<void> | Promise<S>;
 declare type GeneratorResult<S> = Generator<Result<S>, Result<S>, S> | AsyncGenerator<Result<S>, Result<S>, S>;
 declare type ImplResult<S> = Result<S> | GeneratorResult<S>;
 declare type Impl<S, A> = {

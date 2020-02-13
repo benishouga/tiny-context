@@ -14,11 +14,11 @@ npm install tiny-context
 
 This library wraps the React Context API and supports creating contexts with `{ state: { ... }, actions: { ... } }`.
 
-- Easy to understand.
 - Easy to implement with less code.
-- Easy to create async action and generator action.
-- Easy to test.
-- TypeScript friendry.
+- Easy to understand. (like React Context API with Hooks)
+- Easy to create async action and async generator action. (I think it's like redux-saga.)
+- Easy to test. (Only test a stateless implementation.)
+- TypeScript friendry. (Check by type whenever possible.)
 
 ## Steps to use
 
@@ -32,24 +32,22 @@ This library wraps the React Context API and supports creating contexts with `{ 
      increment: (state: CounterState, amount: number) => ({ ...state, count: state.count + amount })
    };
    ```
-3. Create `Provider` and `useContext` from `actions`. Specify the `State` and `actions` for the type argument.
+3. Call `createTinyContext` to create `Provider` and `useContext` from `actions`. Specify the `State` and `actions` for the type argument.
    ```ts
    const { Provider, useContext } = createTinyContext<CounterState, typeof actions>(actions);
    ```
    (option) If you use the `actions` method, you only need to specify `State` type argument.
    ```ts
-   const { Provider, useContext } = createTinyContext<CounterState>().actions({
-     increment: (state, amount: number) => ({ ...state, count: state.count + amount })
-   });
+   const { Provider, useContext } = createTinyContext<CounterState>().actions(actions);
    ```
-4. Can be used like the Context API :)
+4. Can be used like the React Context API :)
 
    ```tsx
    const Buttons = () => {
      const {
        actions: { increment }
      } = useContext();
-     return <button onClick={increment}>+</button>;
+     return <button onClick={() => increment(1)}>+</button>;
    };
 
    const Display = () => {
@@ -69,14 +67,14 @@ This library wraps the React Context API and supports creating contexts with `{ 
 
 ## Examples
 
-Class-based actions, Async action, Generator action and Todo App examples.<br>
+Class-based actions, Async action, Async generator action and Todo App examples.<br>
 https://benishouga.github.io/tiny-context/
 
 ## API
 
 ### createTinyContext
 
-Create Provider and useContext from Actions implementations. Actions implementation methods require the first argument to be `State` and the return value to be `State` (or `Partial<State>`, [`Promise`, `Generator`](https://benishouga.github.io/tiny-context/)).
+Create Provider and useContext from Actions implementations. Actions implementation methods require the first argument to be `State` and the return value to be `State` (or [`Promise`, `Async Generator`](https://benishouga.github.io/tiny-context/)).
 
 Specify the `State` and the `Actions` interface for the type argument.
 
@@ -89,8 +87,11 @@ class CounterActions {
   decrement: (state: CounterState, amount: number) => ({ ...state, count: state.count - amount })
 }
 const { Provider, useContext } = createTinyContext<CounterState, CounterActions>(new CounterActions());
+```
 
-// If use the `actions` method
+If use the `actions` method.
+
+```ts
 const { Provider, useContext } = createTinyContext<CounterState>().actions(new CounterActions());
 ```
 
