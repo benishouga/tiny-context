@@ -5,7 +5,8 @@
     "tiny-context",
     "react",
     "hooks",
-    "context"
+    "context",
+    "store"
   ],
   "version": "1.1.0",
   "license": "MIT",
