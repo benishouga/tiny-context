@@ -85,13 +85,13 @@ export function createStore<S, A extends Impl<S, A>>(
       }
     };
 
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<void>((resolve, reject) =>
       queue.push(async () => {
         await task()
           .then(resolve)
           .catch(reject);
-      });
-    });
+      })
+    );
   };
 
   const convert = () => {
@@ -116,24 +116,18 @@ function _createTinyContext<S>(): Fluent<S>;
 function _createTinyContext<S, A extends Impl<S, A>>(impl: A): CreateResult<S, A>;
 function _createTinyContext<S, A extends Impl<S, A>>(impl?: A): CreateResult<S, A> | Fluent<S> {
   if (impl) {
-    return createTinyContext<S>().actions(impl);
+    const Context = createContext<ContextState<S, A>>({} as any);
+
+    const Provider = ({ value, children = null }: PropsWithChildren<{ value: S }>) => {
+      const { rerender } = useRerender();
+      const { state, actions } = useMemo(() => createStore(value, rerender, impl), [])();
+      return useMemo(() => <Context.Provider value={{ state, actions }}>{children}</Context.Provider>, [state]);
+    };
+
+    return { Provider, useContext: () => useContext(Context) };
   }
 
-  return {
-    actions: function<A extends Impl<S, A>>(implementation: A) {
-      const Context = createContext<ContextState<S, A>>({} as any);
-
-      const Provider = ({ value, children = null }: PropsWithChildren<{ value: S }>) => {
-        const { rerender } = useRerender();
-        const { state, actions } = useMemo(() => createStore(value, rerender, implementation), [])();
-        return useMemo(() => {
-          return <Context.Provider value={{ state, actions }}>{children}</Context.Provider>;
-        }, [state]);
-      };
-
-      return { Provider, useContext: () => useContext(Context) };
-    }
-  };
+  return { actions: <A extends Impl<S, A>>(impl: A) => createTinyContext<S, A>(impl) };
 }
 
 export const createTinyContext = _createTinyContext;
