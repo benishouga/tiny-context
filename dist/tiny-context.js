@@ -109,16 +109,17 @@ export function createStore(value, onChanged, impl) {
             args[_i] = arguments[_i];
         }
         var task = function () { return __awaiter(_this, void 0, void 0, function () {
-            var result, next, _a;
+            var result, isContinue, next, _a;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0: return [4 /*yield*/, action.bind(impl).apply(void 0, __spreadArrays([state], args))];
                     case 1:
                         result = _b.sent();
                         if (!isGenerator(result)) return [3 /*break*/, 6];
+                        isContinue = true;
                         _b.label = 2;
                     case 2:
-                        if (!true) return [3 /*break*/, 5];
+                        if (!isContinue) return [3 /*break*/, 5];
                         return [4 /*yield*/, result.next(state)];
                     case 3:
                         next = _b.sent();
@@ -126,8 +127,7 @@ export function createStore(value, onChanged, impl) {
                         return [4 /*yield*/, next.value];
                     case 4:
                         _a.apply(void 0, [_b.sent()]);
-                        if (next.done)
-                            return [3 /*break*/, 5];
+                        isContinue = !next.done;
                         return [3 /*break*/, 2];
                     case 5: return [3 /*break*/, 7];
                     case 6:

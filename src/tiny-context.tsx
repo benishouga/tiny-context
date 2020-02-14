@@ -71,10 +71,11 @@ export function createStore<S, A extends Impl<S, A>>(
     const task = async () => {
       const result = await action.bind(impl)(state, ...args);
       if (isGenerator<Result<S>>(result)) {
-        while (true) {
+        let isContinue = true;
+        while (isContinue) {
           const next = await result.next(state);
           feed(await next.value);
-          if (next.done) break;
+          isContinue = !next.done;
         }
       } else {
         feed(result);
