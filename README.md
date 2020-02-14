@@ -6,6 +6,8 @@ This library for Context API of React Hooks. Easily create a context with a stat
 
 ## Installation
 
+Requires React 16.8.3 or later.
+
 ```
 npm install tiny-context
 ```
@@ -18,7 +20,7 @@ This library wraps the React Context API and supports creating contexts with `{ 
 - Easy to understand. (like React Context API with Hooks)
 - Easy to create async action and async generator action. (I think it's like redux-saga.)
 - Easy to test. (Only test a stateless implementation.)
-- TypeScript friendry. (Check by type whenever possible.)
+- TypeScript friendry. (Strict type checking.)
 
 ## Steps to use
 
@@ -79,7 +81,7 @@ Create Provider and useContext from Actions implementations. Actions implementat
 Specify the `State` and the `Actions` interface for the type argument.
 
 ```ts
-import { createTinyContext, ExternalActions } from 'tiny-context';
+import { createTinyContext } from 'tiny-context';
 
 type CounterState = { count: number; };
 class CounterActions {
@@ -89,7 +91,7 @@ class CounterActions {
 const { Provider, useContext } = createTinyContext<CounterState, CounterActions>(new CounterActions());
 ```
 
-If use the `actions` method.
+If the `actions` method is used, the type argument of `Actions` can be omitted.
 
 ```ts
 const { Provider, useContext } = createTinyContext<CounterState>().actions(new CounterActions());
