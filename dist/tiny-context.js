@@ -93,7 +93,7 @@ var useRerender = function () {
     var _a = useState(0), _ = _a[0], set = _a[1];
     return { rerender: function () { return set(function (c) { return c + 1; }); } };
 };
-export function createStore(value, onChanged, actions) {
+export function createStore(value, onChanged, impl) {
     var _this = this;
     var state = value;
     var queue = new Queue();
@@ -112,7 +112,7 @@ export function createStore(value, onChanged, actions) {
             var result, next, _a;
             return __generator(this, function (_b) {
                 switch (_b.label) {
-                    case 0: return [4 /*yield*/, action.bind(actions).apply(void 0, __spreadArrays([state], args))];
+                    case 0: return [4 /*yield*/, action.bind(impl).apply(void 0, __spreadArrays([state], args))];
                     case 1:
                         result = _b.sent();
                         if (!isGenerator(result)) return [3 /*break*/, 6];
@@ -138,7 +138,7 @@ export function createStore(value, onChanged, actions) {
             });
         }); };
         return new Promise(function (resolve, reject) {
-            queue.push(function () { return __awaiter(_this, void 0, void 0, function () {
+            return queue.push(function () { return __awaiter(_this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0: return [4 /*yield*/, task()
@@ -154,28 +154,23 @@ export function createStore(value, onChanged, actions) {
     }; };
     var convert = function () {
         var external = {};
-        extract(actions).forEach(function (name) { return (external[name] = convertAction(actions[name])); });
+        extract(impl).forEach(function (name) { return (external[name] = convertAction(impl[name])); });
         return external;
     };
-    return function () { return ({ state: state, actions: convert() }); };
+    var actions = convert();
+    return function () { return ({ state: state, actions: actions }); };
 }
 function _createTinyContext(impl) {
     if (impl) {
-        return createTinyContext().actions(impl);
+        var Context_1 = createContext({});
+        var Provider = function (_a) {
+            var value = _a.value, _b = _a.children, children = _b === void 0 ? null : _b;
+            var rerender = useRerender().rerender;
+            var _c = useMemo(function () { return createStore(value, rerender, impl); }, [])(), state = _c.state, actions = _c.actions;
+            return useMemo(function () { return React.createElement(Context_1.Provider, { value: { state: state, actions: actions } }, children); }, [state]);
+        };
+        return { Provider: Provider, useContext: function () { return useContext(Context_1); } };
     }
-    return {
-        actions: function (implementation) {
-            var Context = createContext({});
-            var Provider = function (_a) {
-                var value = _a.value, _b = _a.children, children = _b === void 0 ? null : _b;
-                var rerender = useRerender().rerender;
-                var _c = useMemo(function () { return createStore(value, rerender, implementation); }, [])(), state = _c.state, actions = _c.actions;
-                return useMemo(function () {
-                    return React.createElement(Context.Provider, { value: { state: state, actions: actions } }, children);
-                }, [state]);
-            };
-            return { Provider: Provider, useContext: function () { return useContext(Context); } };
-        }
-    };
+    return { actions: function (impl) { return createTinyContext(impl); } };
 }
 export var createTinyContext = _createTinyContext;

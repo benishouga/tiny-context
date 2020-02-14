@@ -13,7 +13,7 @@ declare type ContextState<S, A> = {
     state: S;
     actions: Externals<A>;
 };
-export declare function createStore<S, A extends Impl<S, A>>(value: S, onChanged: (s: S) => void, actions: A): () => ContextState<S, A>;
+export declare function createStore<S, A extends Impl<S, A>>(value: S, onChanged: (s: S) => void, impl: A): () => ContextState<S, A>;
 declare type CreateResult<S, A> = {
     Provider: FC<PropsWithChildren<{
         value: S;
