@@ -12,7 +12,7 @@ export default [
     input,
     output: { file: 'lib/tiny-context.js', format: 'cjs', indent: false },
     external,
-    plugins: [typescript({ tsconfigOverride: noDeclarationFiles })]
+    plugins: [typescript()]
   },
   // ES
   {
