@@ -114,6 +114,9 @@ describe('tiny-context', () => {
   describe('class based actions', () => {
     type State = { count: number };
     class Actions {
+      v1: number = 0;
+      v2: string = '0';
+      v3: boolean = false;
       increment(state: State, amount: number) {
         return { count: state.count + amount };
       }

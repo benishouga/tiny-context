@@ -4,10 +4,12 @@ type Result<S> = void | S | Promise<void> | Promise<S>;
 type GeneratorResult<S> = Generator<Result<S>, Result<S>, S> | AsyncGenerator<Result<S>, Result<S>, S>;
 type ImplResult<S> = Result<S> | GeneratorResult<S>;
 
-type Impl<S, A> = { [P in keyof A]: (s: S, ...args: any) => ImplResult<S> };
+type Impl<S, A> = { [P in keyof A]: A[P] extends Function ? (s: S, ...args: any) => ImplResult<S> : any };
 
 type ToExternalParameter<T> = T extends (s: any, ...args: infer P) => any ? P : never;
-type Externals<A> = { [P in keyof A]: (...args: ToExternalParameter<A[P]>) => void | Promise<void> };
+type FunctionOnly<T> = Pick<T, { [K in keyof T]: T[K] extends Function ? K : never }[keyof T]>;
+type ToExternalFunctoins<A> = { [P in keyof A]: (...args: ToExternalParameter<A[P]>) => Promise<void> };
+type Externals<A> = ToExternalFunctoins<FunctionOnly<A>>;
 
 type ContextState<S, A> = { state: S; actions: Externals<A> };
 
@@ -20,7 +22,7 @@ const extract = (obj: object, ignores = IGNORES) => {
   const set: Set<string> = new Set();
   while (t) {
     Object.getOwnPropertyNames(t)
-      .filter(n => !ignores.includes(n))
+      .filter(n => typeof (t as any)[n] === 'function' && !ignores.includes(n))
       .forEach(n => set.add(n));
     t = Object.getPrototypeOf(t);
   }
