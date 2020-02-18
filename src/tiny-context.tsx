@@ -17,6 +17,7 @@ function isGenerator<S>(obj: any): obj is GeneratorResult<S> {
   return obj && typeof obj.next === 'function' && typeof obj.throw === 'function' && typeof obj.return === 'function';
 }
 
+let IGNORES: string[] = [];
 const extract = (obj: object, ignores = IGNORES) => {
   let t = obj;
   const set: Set<string> = new Set();
@@ -29,7 +30,7 @@ const extract = (obj: object, ignores = IGNORES) => {
   return Array.from(set);
 };
 
-const IGNORES: string[] = extract({}, []);
+IGNORES = extract({});
 
 type Task = () => Promise<void>;
 class Queue {
@@ -50,8 +51,9 @@ class Queue {
 }
 
 const useRerender = () => {
-  const [_, set] = useState(0);
-  return { rerender: () => set(c => c + 1) };
+  const [, set] = useState(0);
+  const rerender = useMemo(() => () => set(c => c + 1), [set]);
+  return { rerender };
 };
 
 export function createStore<S, A extends Impl<S, A>>(
@@ -114,14 +116,18 @@ function _createTinyContext<S, A extends Impl<S, A>>(impl?: A): CreateResult<S, 
 
     const Provider = ({ value, children = null }: PropsWithChildren<{ value: S }>) => {
       const { rerender } = useRerender();
-      const { state, actions } = useMemo(() => createStore(value, rerender, impl), [])();
-      return useMemo(() => <Context.Provider value={{ state, actions }}>{children}</Context.Provider>, [state]);
+      const { state, actions } = useMemo(() => createStore(value, rerender, impl), [value, rerender])();
+      return useMemo(() => <Context.Provider value={{ state, actions }}>{children}</Context.Provider>, [
+        state,
+        actions,
+        children
+      ]);
     };
 
     return { Provider, useContext: () => useContext(Context) };
   }
 
-  return { actions: <A extends Impl<S, A>>(impl: A) => createTinyContext<S, A>(impl) };
+  return { actions: <A extends Impl<S, A>>(impl: A) => _createTinyContext<S, A>(impl) };
 }
 
 export const createTinyContext = _createTinyContext;

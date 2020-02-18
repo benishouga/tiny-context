@@ -108,15 +108,16 @@ describe('tiny-context', () => {
 
     test('Provider does not throw an error if no children.', async () => {
       render(<Provider value={{ count: 0 }} />);
+      expect(true).toBeTruthy();
     });
   });
 
   describe('class based actions', () => {
     type State = { count: number };
     class Actions {
-      v1: number = 0;
-      v2: string = '0';
-      v3: boolean = false;
+      v1 = 0;
+      v2 = '0';
+      v3 = false;
       increment(state: State, amount: number) {
         return { count: state.count + amount };
       }

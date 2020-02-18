@@ -82457,19 +82457,20 @@ var __spreadArrays = (undefined && undefined.__spreadArrays) || function () {
 function isGenerator(obj) {
     return obj && typeof obj.next === 'function' && typeof obj.throw === 'function' && typeof obj.return === 'function';
 }
+var IGNORES = [];
 var extract = function (obj, ignores) {
     if (ignores === void 0) { ignores = IGNORES; }
     var t = obj;
     var set = new Set();
     while (t) {
         Object.getOwnPropertyNames(t)
-            .filter(function (n) { return !ignores.includes(n); })
+            .filter(function (n) { return typeof t[n] === 'function' && !ignores.includes(n); })
             .forEach(function (n) { return set.add(n); });
         t = Object.getPrototypeOf(t);
     }
     return Array.from(set);
 };
-var IGNORES = extract({}, []);
+IGNORES = extract({});
 var Queue = /** @class */ (function () {
     function Queue() {
         this.q = [];
@@ -82491,8 +82492,9 @@ var Queue = /** @class */ (function () {
     return Queue;
 }());
 var useRerender = function () {
-    var _a = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])(0), _ = _a[0], set = _a[1];
-    return { rerender: function () { return set(function (c) { return c + 1; }); } };
+    var _a = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])(0), set = _a[1];
+    var rerender = Object(react__WEBPACK_IMPORTED_MODULE_0__["useMemo"])(function () { return function () { return set(function (c) { return c + 1; }); }; }, [set]);
+    return { rerender: rerender };
 };
 function createStore(value, onChanged, impl) {
     var _this = this;
@@ -82567,12 +82569,16 @@ function _createTinyContext(impl) {
         var Provider = function (_a) {
             var value = _a.value, _b = _a.children, children = _b === void 0 ? null : _b;
             var rerender = useRerender().rerender;
-            var _c = Object(react__WEBPACK_IMPORTED_MODULE_0__["useMemo"])(function () { return createStore(value, rerender, impl); }, [])(), state = _c.state, actions = _c.actions;
-            return Object(react__WEBPACK_IMPORTED_MODULE_0__["useMemo"])(function () { return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Context_1.Provider, { value: { state: state, actions: actions } }, children); }, [state]);
+            var _c = Object(react__WEBPACK_IMPORTED_MODULE_0__["useMemo"])(function () { return createStore(value, rerender, impl); }, [value, rerender])(), state = _c.state, actions = _c.actions;
+            return Object(react__WEBPACK_IMPORTED_MODULE_0__["useMemo"])(function () { return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Context_1.Provider, { value: { state: state, actions: actions } }, children); }, [
+                state,
+                actions,
+                children
+            ]);
         };
         return { Provider: Provider, useContext: function () { return Object(react__WEBPACK_IMPORTED_MODULE_0__["useContext"])(Context_1); } };
     }
-    return { actions: function (impl) { return createTinyContext(impl); } };
+    return { actions: function (impl) { return _createTinyContext(impl); } };
 }
 var createTinyContext = _createTinyContext;
 
