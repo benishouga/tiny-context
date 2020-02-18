@@ -31,13 +31,14 @@
   "bugs": "https://github.com/benishouga/tiny-context/issues",
   "homepage": "https://github.com/benishouga/tiny-context",
   "scripts": {
-    "start": "webpack-dev-server --hot --watch-content-base --content-base docs/ --open ",
-    "test": "cross-env NODE_ENV=test jest --coverage",
-    "compile": "rollup -c",
-    "build": "webpack --mode=development",
-    "format": "prettier --write \"./src/**/*.*\" \"./test/**/*.*\" \"./**/*.json\"",
     "clean": "rimraf coverage es lib umd",
-    "prepare": "npm run clean && npm run compile"
+    "prepare": "npm run clean && npm run compile && npm run test && npm run build",
+    "compile": "tsc --noEmit",
+    "build": "rollup -c",
+    "start": "webpack-dev-server --hot --watch-content-base --content-base docs/ --open ",
+    "docs": "webpack --mode=development",
+    "test": "cross-env NODE_ENV=test jest --coverage",
+    "format": "prettier --write \"./src/**/*.*\" \"./test/**/*.*\" \"./**/*.json\""
   },
   "peerDependencies": {
     "react": "^16.8"
