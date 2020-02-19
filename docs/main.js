@@ -82390,12 +82390,12 @@ function extend() {
 /*!******************************!*\
   !*** ./src/tiny-context.tsx ***!
   \******************************/
-/*! exports provided: createStore, createTinyContext */
+/*! exports provided: Store, createTinyContext */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createStore", function() { return createStore; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Store", function() { return Store; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createTinyContext", function() { return createTinyContext; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
@@ -82457,9 +82457,8 @@ var __spreadArrays = (undefined && undefined.__spreadArrays) || function () {
 function isGenerator(obj) {
     return obj && typeof obj.next === 'function' && typeof obj.throw === 'function' && typeof obj.return === 'function';
 }
-var IGNORES = [];
-var extract = function (obj, ignores) {
-    if (ignores === void 0) { ignores = IGNORES; }
+var ignores = [];
+var extract = function (obj) {
     var t = obj;
     var set = new Set();
     while (t) {
@@ -82470,7 +82469,7 @@ var extract = function (obj, ignores) {
     }
     return Array.from(set);
 };
-IGNORES = extract({});
+ignores = extract({});
 var Queue = /** @class */ (function () {
     function Queue() {
         this.q = [];
@@ -82491,90 +82490,105 @@ var Queue = /** @class */ (function () {
     };
     return Queue;
 }());
-var useRerender = function () {
-    var _a = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])(0), set = _a[1];
-    var rerender = Object(react__WEBPACK_IMPORTED_MODULE_0__["useMemo"])(function () { return function () { return set(function (c) { return c + 1; }); }; }, [set]);
-    return { rerender: rerender };
-};
-function createStore(value, onChanged, impl) {
-    var _this = this;
-    var state = value;
-    var queue = new Queue();
-    var feed = function (newState) {
+var Store = /** @class */ (function () {
+    function Store(state, impl) {
+        this.state = state;
+        this.queue = new Queue();
+        this.listeners = [];
+        this.actions = this.convert(impl);
+    }
+    Store.prototype.emit = function (s) {
+        this.listeners.forEach(function (listener) { return listener(s); });
+    };
+    Store.prototype.on = function (listener) {
+        this.listeners.push(listener);
+        return this;
+    };
+    Store.prototype.feed = function (newState) {
         if (newState !== null && newState !== undefined) {
-            state = __assign({}, newState);
-            onChanged(state);
+            this.state = __assign({}, newState);
+            this.emit(this.state);
         }
     };
-    var convertAction = function (action) { return function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        var task = function () { return __awaiter(_this, void 0, void 0, function () {
-            var result, isContinue, next, _a;
+    Store.prototype.convertToExternal = function (impl, action) {
+        var _this = this;
+        var passToImpl = function (args) { return __awaiter(_this, void 0, void 0, function () {
+            var result, more, next, _a;
             return __generator(this, function (_b) {
                 switch (_b.label) {
-                    case 0: return [4 /*yield*/, action.bind(impl).apply(void 0, __spreadArrays([state], args))];
+                    case 0: return [4 /*yield*/, action.bind(impl).apply(void 0, __spreadArrays([this.state], args))];
                     case 1:
                         result = _b.sent();
                         if (!isGenerator(result)) return [3 /*break*/, 6];
-                        isContinue = true;
+                        more = true;
                         _b.label = 2;
                     case 2:
-                        if (!isContinue) return [3 /*break*/, 5];
-                        return [4 /*yield*/, result.next(state)];
+                        if (!more) return [3 /*break*/, 5];
+                        return [4 /*yield*/, result.next(this.state)];
                     case 3:
                         next = _b.sent();
-                        _a = feed;
+                        _a = this.feed;
                         return [4 /*yield*/, next.value];
                     case 4:
-                        _a.apply(void 0, [_b.sent()]);
-                        isContinue = !next.done;
+                        _a.apply(this, [_b.sent()]);
+                        more = !next.done;
                         return [3 /*break*/, 2];
                     case 5: return [3 /*break*/, 7];
                     case 6:
-                        feed(result);
+                        this.feed(result);
                         _b.label = 7;
                     case 7: return [2 /*return*/];
                 }
             });
         }); };
-        return new Promise(function (resolve, reject) {
-            return queue.push(function () { return __awaiter(_this, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, task()
-                                .then(resolve)
-                                .catch(reject)];
-                        case 1:
-                            _a.sent();
-                            return [2 /*return*/];
-                    }
-                });
-            }); });
-        });
-    }; };
-    var convert = function () {
+        return function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            return new Promise(function (resolve, reject) {
+                return _this.queue.push(function () { return __awaiter(_this, void 0, void 0, function () {
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0: return [4 /*yield*/, passToImpl(args)
+                                    .then(resolve)
+                                    .catch(reject)];
+                            case 1:
+                                _a.sent();
+                                return [2 /*return*/];
+                        }
+                    });
+                }); });
+            });
+        };
+    };
+    Store.prototype.convert = function (impl) {
+        var _this = this;
         var external = {};
-        extract(impl).forEach(function (name) { return (external[name] = convertAction(impl[name])); });
+        extract(impl).forEach(function (name) { return (external[name] = _this.convertToExternal(impl, impl[name])); });
         return external;
     };
-    var actions = convert();
-    return function () { return ({ state: state, actions: actions }); };
-}
+    return Store;
+}());
+
+var useRerender = function () {
+    var _a = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])(0), set = _a[1];
+    var rerender = Object(react__WEBPACK_IMPORTED_MODULE_0__["useMemo"])(function () { return function () { return set(function (c) { return c + 1; }); }; }, [set]);
+    return { rerender: rerender };
+};
 function _createTinyContext(impl) {
     if (impl) {
         var Context_1 = Object(react__WEBPACK_IMPORTED_MODULE_0__["createContext"])({});
         var Provider = function (_a) {
             var value = _a.value, _b = _a.children, children = _b === void 0 ? null : _b;
             var rerender = useRerender().rerender;
-            var _c = Object(react__WEBPACK_IMPORTED_MODULE_0__["useMemo"])(function () { return createStore(value, rerender, impl); }, [value, rerender])(), state = _c.state, actions = _c.actions;
-            return Object(react__WEBPACK_IMPORTED_MODULE_0__["useMemo"])(function () { return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Context_1.Provider, { value: { state: state, actions: actions } }, children); }, [
-                state,
-                actions,
-                children
-            ]);
+            var _c = Object(react__WEBPACK_IMPORTED_MODULE_0__["useMemo"])(function () {
+                var store = new Store(value, impl).on(rerender);
+                return function () { return ({ state: store.state, actions: store.actions }); };
+            }, [value, rerender])(), state = _c.state, actions = _c.actions;
+            return Object(react__WEBPACK_IMPORTED_MODULE_0__["useMemo"])(function () {
+                return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Context_1.Provider, { value: { state: state, actions: actions } }, children);
+            }, [state, actions, children]);
         };
         return { Provider: Provider, useContext: function () { return Object(react__WEBPACK_IMPORTED_MODULE_0__["useContext"])(Context_1); } };
     }

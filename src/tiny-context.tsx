@@ -17,8 +17,8 @@ function isGenerator<S>(obj: any): obj is GeneratorResult<S> {
   return obj && typeof obj.next === 'function' && typeof obj.throw === 'function' && typeof obj.return === 'function';
 }
 
-let IGNORES: string[] = [];
-const extract = (obj: object, ignores = IGNORES) => {
+let ignores: string[] = [];
+const extract = (obj: object) => {
   let t = obj;
   const set: Set<string> = new Set();
   while (t) {
@@ -29,8 +29,7 @@ const extract = (obj: object, ignores = IGNORES) => {
   }
   return Array.from(set);
 };
-
-IGNORES = extract({});
+ignores = extract({});
 
 type Task = () => Promise<void>;
 class Queue {
@@ -50,60 +49,63 @@ class Queue {
   }
 }
 
+export class Store<S, A extends Impl<S, A>> {
+  private queue = new Queue();
+  private listeners: ((s: S) => void)[] = [];
+
+  public readonly actions: Externals<A>;
+  constructor(public state: S, impl: A) {
+    this.actions = this.convert(impl);
+  }
+  private emit(s: S) {
+    this.listeners.forEach(listener => listener(s));
+  }
+  public on(listener: (s: S) => void) {
+    this.listeners.push(listener);
+    return this;
+  }
+  private feed(newState: void | S) {
+    if (newState !== null && newState !== undefined) {
+      this.state = { ...newState };
+      this.emit(this.state);
+    }
+  }
+  private convertToExternal(impl: A, action: (state: S, ...args: any) => ImplResult<S>) {
+    const passToImpl = async (args: any) => {
+      const result = await action.bind(impl)(this.state, ...args);
+      if (isGenerator<Result<S>>(result)) {
+        let more = true;
+        while (more) {
+          const next = await result.next(this.state);
+          this.feed(await next.value);
+          more = !next.done;
+        }
+      } else {
+        this.feed(result);
+      }
+    };
+
+    return (...args: any) =>
+      new Promise<void>((resolve, reject) =>
+        this.queue.push(async () => {
+          await passToImpl(args)
+            .then(resolve)
+            .catch(reject);
+        })
+      );
+  }
+  private convert(impl: A) {
+    const external: { [name: string]: (...args: any) => void | Promise<void> } = {};
+    extract(impl).forEach(name => (external[name] = this.convertToExternal(impl, (impl as any)[name])));
+    return external as Externals<A>;
+  }
+}
+
 const useRerender = () => {
   const [, set] = useState(0);
   const rerender = useMemo(() => () => set(c => c + 1), [set]);
   return { rerender };
 };
-
-export function createStore<S, A extends Impl<S, A>>(
-  value: S,
-  onChanged: (s: S) => void,
-  impl: A
-): () => ContextState<S, A> {
-  let state: S = value;
-  const queue = new Queue();
-
-  const feed = (newState: void | S) => {
-    if (newState !== null && newState !== undefined) {
-      state = { ...newState };
-      onChanged(state);
-    }
-  };
-
-  const convertAction = (action: (state: S, ...args: any) => ImplResult<S>) => (...args: any) => {
-    const task = async () => {
-      const result = await action.bind(impl)(state, ...args);
-      if (isGenerator<Result<S>>(result)) {
-        let isContinue = true;
-        while (isContinue) {
-          const next = await result.next(state);
-          feed(await next.value);
-          isContinue = !next.done;
-        }
-      } else {
-        feed(result);
-      }
-    };
-
-    return new Promise<void>((resolve, reject) =>
-      queue.push(async () => {
-        await task()
-          .then(resolve)
-          .catch(reject);
-      })
-    );
-  };
-
-  const convert = () => {
-    const external: { [name: string]: (...args: any) => void | Promise<void> } = {};
-    extract(impl).forEach(name => (external[name] = convertAction((impl as any)[name])));
-    return external as Externals<A>;
-  };
-
-  const actions = convert();
-  return () => ({ state, actions });
-}
 
 type CreateResult<S, A> = { Provider: FC<PropsWithChildren<{ value: S }>>; useContext: () => ContextState<S, A> };
 type Fluent<S> = { actions: <A extends Impl<S, A>>(impl: A) => CreateResult<S, A> };
@@ -116,12 +118,14 @@ function _createTinyContext<S, A extends Impl<S, A>>(impl?: A): CreateResult<S, 
 
     const Provider = ({ value, children = null }: PropsWithChildren<{ value: S }>) => {
       const { rerender } = useRerender();
-      const { state, actions } = useMemo(() => createStore(value, rerender, impl), [value, rerender])();
-      return useMemo(() => <Context.Provider value={{ state, actions }}>{children}</Context.Provider>, [
-        state,
-        actions,
-        children
-      ]);
+      const { state, actions } = useMemo(() => {
+        const store = new Store(value, impl).on(rerender);
+        return () => ({ state: store.state, actions: store.actions });
+      }, [value, rerender])();
+
+      return useMemo(() => {
+        return <Context.Provider value={{ state, actions }}>{children}</Context.Provider>;
+      }, [state, actions, children]);
     };
 
     return { Provider, useContext: () => useContext(Context) };
