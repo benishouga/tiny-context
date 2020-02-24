@@ -15,7 +15,6 @@ module.exports = {
     'prettier/@typescript-eslint'
   ],
   rules: {
-    'react-hooks/exhaustive-deps': 'warn',
     'react-hooks/rules-of-hooks': 'error',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',

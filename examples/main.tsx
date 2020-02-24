@@ -6,6 +6,7 @@ import { GeneratorApp } from './generator/GeneratorApp';
 import { MinimumApp } from './minimum/MinimumApp';
 import { ClassBasedApp } from './class-based/ClassBasedApp';
 import { CodePreviewer } from './CodePreviewer';
+import { CancelApp } from './cancel/CancelApp';
 
 ReactDOM.render(
   <>
@@ -19,6 +20,9 @@ ReactDOM.render(
     <hr />
     <AsyncApp />
     <CodePreviewer name="AsyncApp.tsx" code={require('!!raw-loader!./async/AsyncApp.tsx').default} />
+    <hr />
+    <CancelApp />
+    <CodePreviewer name="CancelApp.tsx" code={require('!!raw-loader!./cancel/CancelApp.tsx').default} />
     <hr />
     <GeneratorApp />
     <CodePreviewer name="GeneratorApp.tsx" code={require('!!raw-loader!./generator/GeneratorApp.tsx').default} />

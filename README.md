@@ -126,8 +126,7 @@ const SomeConsumer = () => {
 ## Limitation
 
 - Any action in the same context is executed sequentially.
-  - If you want to process in parallel like incremental search, control it out of context.
-- Not support to cancel a action in processing.
+  - When processing in parallel, process them together outside the context or within the context.
 
 ## Contributions
 
