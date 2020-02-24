@@ -49,14 +49,15 @@ class Queue {
   }
 }
 
+type Listener<S> = (s: S) => void;
 export class Store<S, A extends Impl<S, A>> {
   private queue = new Queue();
-  private listeners: ((s: S) => void)[] = [];
+  private listeners: Listener<S>[] = [];
   public readonly actions: Externals<A>;
   constructor(public state: S, impl: A) {
     this.actions = this.convertToExternals(impl);
   }
-  public onChanged(listener: (s: S) => void) {
+  public onChanged(listener: Listener<S>) {
     this.listeners.push(listener);
     return this;
   }
