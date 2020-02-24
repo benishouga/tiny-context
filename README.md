@@ -69,7 +69,7 @@ This library wraps the React Context API and supports creating contexts with `{ 
 
 ## Examples
 
-Class-based actions, Async action, Async generator action and Todo App examples.<br>
+Class-based actions, Async action, Async generator action, fetch cancellation, and Todo App examples.<br>
 https://benishouga.github.io/tiny-context/
 
 ## API

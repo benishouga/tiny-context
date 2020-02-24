@@ -6,7 +6,8 @@
     "react",
     "hooks",
     "context",
-    "store"
+    "store",
+    "state"
   ],
   "version": "1.5.1",
   "license": "MIT",
