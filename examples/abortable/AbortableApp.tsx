@@ -2,17 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { createTinyContext } from '../../src/tiny-context';
 import { wait } from '../wait';
 
-type State = { text: string; error: string };
+type State = { text: string; error: string; requesting: boolean };
 
 class Actions {
-  async fetch(state: State, target: string, signal: AbortSignal) {
-    await wait();
+  async *fetch(state: State, target: string, signal: AbortSignal) {
+    state = yield { ...state, requesting: true };
     try {
       const res = await fetch(`./${target}`, { signal });
+      await wait({ signal }); // more delay !!
       const text = await res.text();
-      return { ...state, text, error: '' };
+      return { ...state, text, error: '', requesting: false };
     } catch (error) {
-      return { ...state, text: '', error: 'fetch error' };
+      return { ...state, text: '', error: 'fetch error', requesting: false };
     }
   }
 }
@@ -41,15 +42,18 @@ const Buttons = () => {
     <>
       <button onClick={() => feeeeeeeetch('data1')}>fetch data1</button>
       <button onClick={() => feeeeeeeetch('data2')}>fetch data2</button>
-      <button onClick={() => abortController.abort()}>cancel</button>
+      <button onClick={() => abortController.abort()}>abort</button>
     </>
   );
 };
 
 const Display = () => {
   const {
-    state: { text, error }
+    state: { text, error, requesting }
   } = useContext();
+  if (requesting) {
+    return <>requesting...</>;
+  }
   if (!text && !error) {
     return null;
   }
@@ -60,8 +64,8 @@ const Display = () => {
   );
 };
 
-export const CancelApp = () => (
-  <Provider value={{ text: '', error: '' }}>
-    CancelApp: <Buttons /> <Display />
+export const AbortableApp = () => (
+  <Provider value={{ text: '', error: '', requesting: false }}>
+    AbortableApp: <Buttons /> <Display />
   </Provider>
 );

@@ -229,16 +229,16 @@ var AsyncApp = function () { return (react__WEBPACK_IMPORTED_MODULE_0___default.
 
 /***/ }),
 
-/***/ "./examples/cancel/CancelApp.tsx":
-/*!***************************************!*\
-  !*** ./examples/cancel/CancelApp.tsx ***!
-  \***************************************/
-/*! exports provided: CancelApp */
+/***/ "./examples/cancel/RequestCancellationApp.tsx":
+/*!****************************************************!*\
+  !*** ./examples/cancel/RequestCancellationApp.tsx ***!
+  \****************************************************/
+/*! exports provided: RequestCancellationApp */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CancelApp", function() { return CancelApp; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "RequestCancellationApp", function() { return RequestCancellationApp; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _src_tiny_context__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../src/tiny-context */ "./src/tiny-context.tsx");
@@ -253,15 +253,6 @@ var __assign = (undefined && undefined.__assign) || function () {
         return t;
     };
     return __assign.apply(this, arguments);
-};
-var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
 };
 var __generator = (undefined && undefined.__generator) || function (thisArg, body) {
     var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
@@ -290,6 +281,18 @@ var __generator = (undefined && undefined.__generator) || function (thisArg, bod
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __await = (undefined && undefined.__await) || function (v) { return this instanceof __await ? (this.v = v, this) : new __await(v); }
+var __asyncGenerator = (undefined && undefined.__asyncGenerator) || function (thisArg, _arguments, generator) {
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var g = generator.apply(thisArg, _arguments || []), i, q = [];
+    return i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i;
+    function verb(n) { if (g[n]) i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; }
+    function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }
+    function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r); }
+    function fulfill(value) { resume("next", value); }
+    function reject(value) { resume("throw", value); }
+    function settle(f, v) { if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]); }
+};
 
 
 
@@ -297,28 +300,33 @@ var Actions = /** @class */ (function () {
     function Actions() {
     }
     Actions.prototype.fetch = function (state, target, signal) {
-        return __awaiter(this, void 0, void 0, function () {
+        return __asyncGenerator(this, arguments, function fetch_1() {
             var res, text, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, Object(_wait__WEBPACK_IMPORTED_MODULE_2__["wait"])()];
-                    case 1:
-                        _a.sent();
-                        _a.label = 2;
+                    case 0: return [4 /*yield*/, __await(__assign(__assign({}, state), { requesting: true }))];
+                    case 1: return [4 /*yield*/, _a.sent()];
                     case 2:
-                        _a.trys.push([2, 5, , 6]);
-                        return [4 /*yield*/, fetch("./" + target, { signal: signal })];
+                        state = _a.sent();
+                        _a.label = 3;
                     case 3:
-                        res = _a.sent();
-                        return [4 /*yield*/, res.text()];
+                        _a.trys.push([3, 8, , 10]);
+                        return [4 /*yield*/, __await(Object(_wait__WEBPACK_IMPORTED_MODULE_2__["wait"])({ signal: signal }))];
                     case 4:
-                        text = _a.sent();
-                        return [2 /*return*/, __assign(__assign({}, state), { text: text, error: '' })];
+                        _a.sent();
+                        return [4 /*yield*/, __await(fetch("./" + target, { signal: signal }))];
                     case 5:
+                        res = _a.sent();
+                        return [4 /*yield*/, __await(res.text())];
+                    case 6:
+                        text = _a.sent();
+                        return [4 /*yield*/, __await(__assign(__assign({}, state), { text: text, error: '', requesting: false }))];
+                    case 7: return [2 /*return*/, _a.sent()];
+                    case 8:
                         error_1 = _a.sent();
-                        console.log(error_1);
-                        return [2 /*return*/, __assign(__assign({}, state), { text: '', error: 'fetch error' })];
-                    case 6: return [2 /*return*/];
+                        return [4 /*yield*/, __await(__assign(__assign({}, state), { text: '', error: 'fetch error', requesting: false }))];
+                    case 9: return [2 /*return*/, _a.sent()];
+                    case 10: return [2 /*return*/];
                 }
             });
         });
@@ -342,10 +350,13 @@ var Buttons = function () {
     return (react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null,
         react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", { onClick: function () { return feeeeeeeetch('data1'); } }, "fetch data1"),
         react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", { onClick: function () { return feeeeeeeetch('data2'); } }, "fetch data2"),
-        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", { onClick: function () { return abortController.abort(); } }, "cancel")));
+        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", { onClick: function () { return abortController.abort(); } }, "abort")));
 };
 var Display = function () {
-    var _a = useContext().state, text = _a.text, error = _a.error;
+    var _a = useContext().state, text = _a.text, error = _a.error, requesting = _a.requesting;
+    if (requesting) {
+        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, "requesting...");
+    }
     if (!text && !error) {
         return null;
     }
@@ -354,8 +365,8 @@ var Display = function () {
         " ",
         react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", { style: { color: '#f80' } }, error)));
 };
-var CancelApp = function () { return (react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Provider, { value: { text: '', error: '' } },
-    "CancelApp: ",
+var RequestCancellationApp = function () { return (react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Provider, { value: { text: '', error: '', requesting: false } },
+    "RequestCancellationApp: ",
     react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Buttons, null),
     " ",
     react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Display, null))); };
@@ -548,7 +559,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _minimum_MinimumApp__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./minimum/MinimumApp */ "./examples/minimum/MinimumApp.tsx");
 /* harmony import */ var _class_based_ClassBasedApp__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./class-based/ClassBasedApp */ "./examples/class-based/ClassBasedApp.tsx");
 /* harmony import */ var _CodePreviewer__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./CodePreviewer */ "./examples/CodePreviewer.tsx");
-/* harmony import */ var _cancel_CancelApp__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./cancel/CancelApp */ "./examples/cancel/CancelApp.tsx");
+/* harmony import */ var _cancel_RequestCancellationApp__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./cancel/RequestCancellationApp */ "./examples/cancel/RequestCancellationApp.tsx");
 
 
 
@@ -570,11 +581,11 @@ react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(react__WEBPACK_IMPORTED_
     react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_async_AsyncApp__WEBPACK_IMPORTED_MODULE_3__["AsyncApp"], null),
     react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_CodePreviewer__WEBPACK_IMPORTED_MODULE_7__["CodePreviewer"], { name: "AsyncApp.tsx", code: __webpack_require__(/*! !raw-loader!./async/AsyncApp.tsx */ "./node_modules/raw-loader/dist/cjs.js!./examples/async/AsyncApp.tsx").default }),
     react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null),
-    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_cancel_CancelApp__WEBPACK_IMPORTED_MODULE_8__["CancelApp"], null),
-    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_CodePreviewer__WEBPACK_IMPORTED_MODULE_7__["CodePreviewer"], { name: "CancelApp.tsx", code: __webpack_require__(/*! !raw-loader!./cancel/CancelApp.tsx */ "./node_modules/raw-loader/dist/cjs.js!./examples/cancel/CancelApp.tsx").default }),
-    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null),
     react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_generator_GeneratorApp__WEBPACK_IMPORTED_MODULE_4__["GeneratorApp"], null),
     react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_CodePreviewer__WEBPACK_IMPORTED_MODULE_7__["CodePreviewer"], { name: "GeneratorApp.tsx", code: __webpack_require__(/*! !raw-loader!./generator/GeneratorApp.tsx */ "./node_modules/raw-loader/dist/cjs.js!./examples/generator/GeneratorApp.tsx").default }),
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null),
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_cancel_RequestCancellationApp__WEBPACK_IMPORTED_MODULE_8__["RequestCancellationApp"], null),
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_CodePreviewer__WEBPACK_IMPORTED_MODULE_7__["CodePreviewer"], { name: "RequestCancellationApp.tsx", code: __webpack_require__(/*! !raw-loader!./cancel/RequestCancellationApp.tsx */ "./node_modules/raw-loader/dist/cjs.js!./examples/cancel/RequestCancellationApp.tsx").default }),
     react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null),
     react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_todo_TodoApp__WEBPACK_IMPORTED_MODULE_2__["default"], null),
     react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_CodePreviewer__WEBPACK_IMPORTED_MODULE_7__["CodePreviewer"], { name: "TodoApp.tsx", code: __webpack_require__(/*! !raw-loader!./todo/TodoApp.tsx */ "./node_modules/raw-loader/dist/cjs.js!./examples/todo/TodoApp.tsx").default }),
@@ -980,7 +991,18 @@ var TodoProvider = function (_a) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "wait", function() { return wait; });
-var wait = function () { return new Promise(function (resolve) { return setTimeout(resolve, 500); }); };
+var wait = function (_a) {
+    var signal = (_a === void 0 ? {} : _a).signal;
+    return new Promise(function (resolve, reject) {
+        var id = setTimeout(resolve, 500);
+        if (signal) {
+            signal.addEventListener('abort', function () {
+                clearTimeout(id);
+                reject('aborted');
+            });
+        }
+    });
+};
 
 
 /***/ }),
@@ -29017,16 +29039,16 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/raw-loader/dist/cjs.js!./examples/cancel/CancelApp.tsx":
-/*!*****************************************************************************!*\
-  !*** ./node_modules/raw-loader/dist/cjs.js!./examples/cancel/CancelApp.tsx ***!
-  \*****************************************************************************/
+/***/ "./node_modules/raw-loader/dist/cjs.js!./examples/cancel/RequestCancellationApp.tsx":
+/*!******************************************************************************************!*\
+  !*** ./node_modules/raw-loader/dist/cjs.js!./examples/cancel/RequestCancellationApp.tsx ***!
+  \******************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("import React, { useState, useEffect } from 'react';\nimport { createTinyContext } from '../../src/tiny-context';\nimport { wait } from '../wait';\n\ntype State = { text: string; error: string };\n\nclass Actions {\n  async fetch(state: State, target: string, signal: AbortSignal) {\n    await wait();\n    try {\n      const res = await fetch(`./${target}`, { signal });\n      const text = await res.text();\n      return { ...state, text, error: '' };\n    } catch (error) {\n      console.log(error);\n      return { ...state, text: '', error: 'fetch error' };\n    }\n  }\n}\n\nconst { Provider, useContext } = createTinyContext<State>().actions(new Actions());\n\nconst Buttons = () => {\n  const [abortController, setAbortController] = useState(new AbortController());\n  const {\n    actions: { fetch }\n  } = useContext();\n\n  const feeeeeeeetch = (target: string) => {\n    abortController.abort();\n    const next = new AbortController();\n    setAbortController(next);\n    fetch(target, next.signal);\n  };\n\n  useEffect(() => {\n    feeeeeeeetch('data1');\n    return () => abortController.abort();\n  }, []);\n\n  return (\n    <>\n      <button onClick={() => feeeeeeeetch('data1')}>fetch data1</button>\n      <button onClick={() => feeeeeeeetch('data2')}>fetch data2</button>\n      <button onClick={() => abortController.abort()}>cancel</button>\n    </>\n  );\n};\n\nconst Display = () => {\n  const {\n    state: { text, error }\n  } = useContext();\n  if (!text && !error) {\n    return null;\n  }\n  return (\n    <>\n      {text} <span style={{ color: '#f80' }}>{error}</span>\n    </>\n  );\n};\n\nexport const CancelApp = () => (\n  <Provider value={{ text: '', error: '' }}>\n    CancelApp: <Buttons /> <Display />\n  </Provider>\n);\n");
+/* harmony default export */ __webpack_exports__["default"] = ("import React, { useState, useEffect } from 'react';\nimport { createTinyContext } from '../../src/tiny-context';\nimport { wait } from '../wait';\n\ntype State = { text: string; error: string; requesting: boolean };\n\nclass Actions {\n  async *fetch(state: State, target: string, signal: AbortSignal) {\n    state = yield { ...state, requesting: true };\n    try {\n      await wait({ signal });\n      const res = await fetch(`./${target}`, { signal });\n      const text = await res.text();\n      return { ...state, text, error: '', requesting: false };\n    } catch (error) {\n      return { ...state, text: '', error: 'fetch error', requesting: false };\n    }\n  }\n}\n\nconst { Provider, useContext } = createTinyContext<State>().actions(new Actions());\n\nconst Buttons = () => {\n  const [abortController, setAbortController] = useState(new AbortController());\n  const {\n    actions: { fetch }\n  } = useContext();\n\n  const feeeeeeeetch = (target: string) => {\n    abortController.abort();\n    const next = new AbortController();\n    setAbortController(next);\n    fetch(target, next.signal);\n  };\n\n  useEffect(() => {\n    feeeeeeeetch('data1');\n    return () => abortController.abort();\n  }, []);\n\n  return (\n    <>\n      <button onClick={() => feeeeeeeetch('data1')}>fetch data1</button>\n      <button onClick={() => feeeeeeeetch('data2')}>fetch data2</button>\n      <button onClick={() => abortController.abort()}>abort</button>\n    </>\n  );\n};\n\nconst Display = () => {\n  const {\n    state: { text, error, requesting }\n  } = useContext();\n  if (requesting) {\n    return <>requesting...</>;\n  }\n  if (!text && !error) {\n    return null;\n  }\n  return (\n    <>\n      {text} <span style={{ color: '#f80' }}>{error}</span>\n    </>\n  );\n};\n\nexport const RequestCancellationApp = () => (\n  <Provider value={{ text: '', error: '', requesting: false }}>\n    RequestCancellationApp: <Buttons /> <Display />\n  </Provider>\n);\n");
 
 /***/ }),
 
@@ -82643,12 +82665,19 @@ var Queue = /** @class */ (function () {
     return Queue;
 }());
 var Store = /** @class */ (function () {
-    function Store(state, impl) {
-        this.state = state;
+    function Store(_state, impl) {
+        this._state = _state;
         this.queue = new Queue();
         this.listeners = [];
         this.actions = this.convertToExternals(impl);
     }
+    Object.defineProperty(Store.prototype, "state", {
+        get: function () {
+            return this._state;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Store.prototype.onChanged = function (listener) {
         this.listeners.push(listener);
         return this;
@@ -82656,8 +82685,8 @@ var Store = /** @class */ (function () {
     Store.prototype.feed = function (newState) {
         var _this = this;
         if (newState !== null && newState !== undefined) {
-            this.state = __assign({}, newState);
-            this.listeners.forEach(function (listener) { return listener(_this.state); });
+            this._state = __assign({}, newState);
+            this.listeners.forEach(function (listener) { return listener(_this._state); });
         }
     };
     Store.prototype.convertToExternals = function (impl) {
@@ -82672,7 +82701,7 @@ var Store = /** @class */ (function () {
             var result, more, next, _a;
             return __generator(this, function (_b) {
                 switch (_b.label) {
-                    case 0: return [4 /*yield*/, action.apply(void 0, __spreadArrays([this.state], args))];
+                    case 0: return [4 /*yield*/, action.apply(void 0, __spreadArrays([this._state], args))];
                     case 1:
                         result = _b.sent();
                         if (!isGenerator(result)) return [3 /*break*/, 6];
@@ -82680,7 +82709,7 @@ var Store = /** @class */ (function () {
                         _b.label = 2;
                     case 2:
                         if (!more) return [3 /*break*/, 5];
-                        return [4 /*yield*/, result.next(this.state)];
+                        return [4 /*yield*/, result.next(this._state)];
                     case 3:
                         next = _b.sent();
                         _a = this.feed;
