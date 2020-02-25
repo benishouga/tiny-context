@@ -54,7 +54,10 @@ export class Store<S, A extends Impl<S, A>> {
   private queue = new Queue();
   private listeners: Listener<S>[] = [];
   public readonly actions: Externals<A>;
-  constructor(public state: S, impl: A) {
+  public get state() {
+    return this._state;
+  }
+  constructor(private _state: S, impl: A) {
     this.actions = this.convertToExternals(impl);
   }
   public onChanged(listener: Listener<S>) {
@@ -63,8 +66,8 @@ export class Store<S, A extends Impl<S, A>> {
   }
   private feed(newState: void | S) {
     if (newState !== null && newState !== undefined) {
-      this.state = { ...newState };
-      this.listeners.forEach(listener => listener(this.state));
+      this._state = { ...newState };
+      this.listeners.forEach(listener => listener(this._state));
     }
   }
   private convertToExternals(impl: A) {
@@ -74,11 +77,11 @@ export class Store<S, A extends Impl<S, A>> {
   }
   private convert(action: (state: S, ...args: any) => ImplResult<S>) {
     const passToImpl = async (args: any) => {
-      const result = await action(this.state, ...args);
+      const result = await action(this._state, ...args);
       if (isGenerator<Result<S>>(result)) {
         let more = true;
         while (more) {
-          const next = await result.next(this.state);
+          const next = await result.next(this._state);
           this.feed(await next.value);
           more = !next.done;
         }
