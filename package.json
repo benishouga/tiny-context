@@ -32,8 +32,8 @@
   "bugs": "https://github.com/benishouga/tiny-context/issues",
   "homepage": "https://github.com/benishouga/tiny-context",
   "scripts": {
-    "clean": "rimraf coverage es lib umd",
-    "prepare": "npm run clean && npm run compile && npm run lint && npm run test && npm run build",
+    "clean": "rimraf coverage es lib umd docs/**/*.js",
+    "prepare": "npm run clean && npm run compile && npm run lint && npm run test && npm run build && npm run docs",
     "compile": "tsc --noEmit",
     "lint": "eslint --ext=tsx src test",
     "build": "rollup -c",
