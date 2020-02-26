@@ -38,7 +38,7 @@
     "lint": "eslint --ext=tsx src test",
     "build": "rollup -c",
     "start": "webpack-dev-server --hot --watch-content-base --content-base docs/ --open ",
-    "docs": "webpack --mode=development",
+    "docs": "webpack --mode=production",
     "test": "cross-env NODE_ENV=test jest --coverage",
     "format": "prettier --write \"./src/**/*.*\" \"./test/**/*.*\" \"./**/*.json\""
   },

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Prism as ReactSyntaxHighlight } from 'react-syntax-highlighter';
+import { PrismAsyncLight as ReactSyntaxHighlight } from 'react-syntax-highlighter';
 import { prism as style } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 export const CodePreviewer = ({ name, code }: { name: string; code: string }) => {

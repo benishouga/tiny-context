@@ -7,8 +7,6 @@ module.exports = {
     path: path.resolve(__dirname, 'docs')
   },
 
-  devtool: 'source-map',
-
   resolve: {
     extensions: ['.ts', '.tsx', '.js']
   },
