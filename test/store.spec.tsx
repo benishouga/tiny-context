@@ -45,6 +45,9 @@ describe('Store', () => {
   test('class-based', async () => {
     type State = { count: number };
     class Actions {
+      v1 = 0;
+      v2 = '0';
+      v3 = false;
       increment(state: State, amount: number) {
         return { count: state.count + amount };
       }
