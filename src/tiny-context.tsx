@@ -31,4 +31,13 @@ function _createTinyContext<S, A extends Impl<S, A>>(impl?: A): CreateResult<S, 
   return { actions: <A extends Impl<S, A>>(impl: A) => _createTinyContext<S, A>(impl) };
 }
 
+/**
+ * Class for managing the `State`.
+
+ * @template S `State` to managed.
+ * @template A `Actions` to change `State`.
+ *   `Actions` implementation methods require the first argument to be `State` and the return value to be `State` (or [`Promise`, `Async Generator`](https://benishouga.github.io/tiny-context/)).
+ * @returns `Provider` and `useContext`.
+ * @see https://github.com/benishouga/tiny-context#createTinyContext
+ */
 export const createTinyContext = _createTinyContext;

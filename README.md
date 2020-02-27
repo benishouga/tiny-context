@@ -109,7 +109,7 @@ const SomeApp = () => (
 );
 ```
 
-`useContext` is hooks used on a consumer. Not need arguments. You will get an object with a State and a function that calls the Actions defined earlier.
+`useContext` is hooks used on a consumer. Not need arguments. You will get an object of `{ state: {...}, acitons: {...} }`.
 
 Function arguments are inherited from the second and subsequent arguments of the previously defined Action. The return value is a uniform `Promise<void>`.
 
@@ -122,6 +122,46 @@ const SomeConsumer = () => {
 
 };
 ```
+
+### class Store<S, A>
+
+Class for managing the `State`. ([`createTinyContext`](https://github.com/benishouga/tiny-context#createTinyContext) uses this.)
+
+Given a `State` and `Actions` to change `State`, `Actions` are sequenced to prevent invalid `State`.
+
+- **S** `State` to managed.
+- **A** `Actions` to change `State`. `Actions` implementation methods require the first argument to be `State` and the return value to be `State` (or [`Promise`, `Async Generator`](https://benishouga.github.io/tiny-context/)).
+
+#### constructor(state, impl)
+
+- **state** Initial `State`.
+- **impl** `Actions` to change `State`.
+
+```ts
+type State = { count: number };
+const store = new Store(
+  { count: 0 },
+  { increment: (state: State, amount: number) => ({ count: state.count + amount }) }
+);
+const { increment } = store.actions;
+await increment(1);
+const { count } = store.state;
+console.log(count); // => 1
+```
+
+#### readonly state
+
+Current `State`.
+
+#### readonly actions
+
+`Actions` to change `State`.
+
+Function arguments are inherited from the second and subsequent arguments of the previously defined Action. The return value is a uniform `Promise<void>`.
+
+#### onChanged(listener)
+
+Adds a change listener.
 
 ## Limitation
 
