@@ -1,4 +1,4 @@
-import { Store } from '../src';
+import { Store } from '../src/tiny-context';
 
 const wait = async (number = 10) => new Promise(resolve => setTimeout(resolve, number));
 const waitFor = async (condition: () => boolean, timeout = 50) => {

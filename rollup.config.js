@@ -4,7 +4,7 @@ import typescript from 'rollup-plugin-typescript2';
 import { terser } from 'rollup-plugin-terser';
 import pkg from './package.json';
 
-const input = 'src/index.ts';
+const input = 'src/tiny-context.ts';
 const external = [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})];
 const noDeclarationFiles = { compilerOptions: { declaration: false } };
 

@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useMemo, PropsWithChildren, FC, useCallback } from 'react';
 import { Externals, Impl, Store } from './store';
 
+export { Store };
+
 type ContextState<S, A> = { state: S; actions: Externals<A> };
 
 const useRerender = () => {

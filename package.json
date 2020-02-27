@@ -19,7 +19,7 @@
   "main": "lib/tiny-context.js",
   "unpkg": "umd/tiny-context.js",
   "module": "es/tiny-context.js",
-  "types": "lib/index.d.ts",
+  "types": "lib/tiny-context.d.ts",
   "files": [
     "es",
     "lib",
