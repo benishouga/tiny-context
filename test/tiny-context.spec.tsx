@@ -2,7 +2,7 @@ import '@testing-library/jest-dom/extend-expect';
 import React from 'react';
 import { render, fireEvent, screen, wait, waitForElement } from '@testing-library/react';
 
-import { createTinyContext } from '../src/tiny-context';
+import { createTinyContext } from '../src';
 
 const wait10 = async () => new Promise(resolve => setTimeout(resolve, 10));
 
