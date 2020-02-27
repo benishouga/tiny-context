@@ -114,7 +114,9 @@ describe('Store', () => {
         return { ...state, count: state.count + amount };
       }
     }
+    const spy = jest.fn();
     const store = new Store({ count: 0 }, new Actions());
+    store.onChanged(spy);
     const { iiincrement } = store.actions;
     iiincrement(1);
     {
@@ -132,5 +134,10 @@ describe('Store', () => {
       const { count } = store.state;
       expect(count).toBe(3);
     }
+    expect(spy).toBeCalledTimes(3);
+    const [[first], [second], [third]] = spy.mock.calls;
+    expect(first.count).toBe(1);
+    expect(second.count).toBe(2);
+    expect(third.count).toBe(3);
   });
 });
