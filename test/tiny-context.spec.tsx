@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom/extend-expect';
 import React from 'react';
-import { render, fireEvent, screen, wait, waitForElement } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
 
 import { createTinyContext } from '../src/tiny-context';
 
@@ -47,43 +47,40 @@ describe('tiny-context', () => {
     });
 
     test('Update the State using an action.', async () => {
-      render(
+      const { getByText, findByText } = render(
         <Provider value={{ count: 0 }}>
           <IncrementButton />
           <Display />
         </Provider>
       );
-      expect(screen.getByText('count is 0')).toBeInTheDocument();
-      fireEvent.click(screen.getByText('button'));
-      await waitForElement(() => screen.getByText('count is 1'));
-      expect(screen.getByText('count is 1')).toBeInTheDocument();
+      expect(getByText('count is 0')).toBeInTheDocument();
+      fireEvent.click(getByText('button'));
+      expect(await findByText('count is 1')).toBeDefined();
     });
 
     test('Action is executed sequentially when double-clicked.', async () => {
-      render(
+      const { getByText, findByText } = render(
         <Provider value={{ count: 0 }}>
           <IncrementButton />
           <Display />
         </Provider>
       );
-      expect(screen.getByText('count is 0')).toBeInTheDocument();
-      fireEvent.click(screen.getByText('button'));
-      fireEvent.click(screen.getByText('button'));
-      await waitForElement(() => screen.getByText('count is 2'));
-      expect(screen.getByText('count is 2')).toBeInTheDocument();
+      expect(getByText('count is 0')).toBeInTheDocument();
+      fireEvent.click(getByText('button'));
+      fireEvent.click(getByText('button'));
+      expect(await findByText('count is 2')).toBeDefined();
     });
 
     test('Action is executed sequentially when the action is called twice on the same event loop.', async () => {
-      render(
+      const { getByText, findByText } = render(
         <Provider value={{ count: 0 }}>
           <TwiceButton />
           <Display />
         </Provider>
       );
-      expect(screen.getByText('count is 0')).toBeInTheDocument();
-      fireEvent.click(screen.getByText('button'));
-      await waitForElement(() => screen.getByText('count is 2'));
-      expect(screen.getByText('count is 2')).toBeInTheDocument();
+      expect(getByText('count is 0')).toBeInTheDocument();
+      fireEvent.click(getByText('button'));
+      expect(await findByText('count is 2')).toBeDefined();
     });
 
     test('Provider does not throw an error if no children.', async () => {
@@ -114,16 +111,15 @@ describe('tiny-context', () => {
     };
 
     test('Actions work even if made based on Class.', async () => {
-      render(
+      const { getByText, findByText } = render(
         <Provider value={{ count: 0 }}>
           <IncrementButton />
           <Display />
         </Provider>
       );
-      expect(screen.getByText('count is 0')).toBeInTheDocument();
-      fireEvent.click(screen.getByText('button'));
-      await wait();
-      expect(screen.getByText('count is 1')).toBeInTheDocument();
+      expect(getByText('count is 0')).toBeInTheDocument();
+      fireEvent.click(getByText('button'));
+      expect(await findByText('count is 1')).toBeDefined();
     });
   });
   describe('async actions', () => {
@@ -148,30 +144,28 @@ describe('tiny-context', () => {
     };
 
     test('Async action works.', async () => {
-      render(
+      const { getByText, findByText } = render(
         <Provider value={{ count: 0 }}>
           <IncrementButton />
           <Display />
         </Provider>
       );
-      expect(screen.getByText('count is 0')).toBeInTheDocument();
-      fireEvent.click(screen.getByText('button'));
-      await waitForElement(() => screen.getByText('count is 1'));
-      expect(screen.getByText('count is 1')).toBeInTheDocument();
+      expect(getByText('count is 0')).toBeInTheDocument();
+      fireEvent.click(getByText('button'));
+      expect(await findByText('count is 1')).toBeDefined();
     });
 
     test('Async action is executed sequentially.', async () => {
-      render(
+      const { getByText, findByText } = render(
         <Provider value={{ count: 0 }}>
           <IncrementButton />
           <Display />
         </Provider>
       );
-      expect(screen.getByText('count is 0')).toBeInTheDocument();
-      fireEvent.click(screen.getByText('button'));
-      fireEvent.click(screen.getByText('button'));
-      await waitForElement(() => screen.getByText('count is 2'));
-      expect(screen.getByText('count is 2')).toBeInTheDocument();
+      expect(getByText('count is 0')).toBeInTheDocument();
+      fireEvent.click(getByText('button'));
+      fireEvent.click(getByText('button'));
+      expect(await findByText('count is 2')).toBeDefined();
     });
   });
 });
