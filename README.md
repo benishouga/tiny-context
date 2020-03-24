@@ -31,7 +31,7 @@ This library wraps the React Context API and supports creating contexts with `{ 
 2. Define `actions` that takes `State` as the first argument and returns `State`. `actions` can also be created on a [class-base](https://benishouga.github.io/tiny-context/).
    ```ts
    const actions = {
-     increment: (state: CounterState, amount: number) => ({ ...state, count: state.count + amount })
+     increment: (state: CounterState, amount: number) => ({ ...state, count: state.count + amount }),
    };
    ```
 3. Call `createTinyContext` to create `Provider` and `useContext` from `actions`. Specify the `State` and `actions` for the type argument.
@@ -47,14 +47,14 @@ This library wraps the React Context API and supports creating contexts with `{ 
    ```tsx
    const Buttons = () => {
      const {
-       actions: { increment }
+       actions: { increment },
      } = useContext();
      return <button onClick={() => increment(1)}>+</button>;
    };
 
    const Display = () => {
      const {
-       state: { count }
+       state: { count },
      } = useContext();
      return <span>{count}</span>;
    };
@@ -111,7 +111,7 @@ const SomeApp = () => (
 
 `useContext` is hooks used on a consumer. Not need arguments. You will get an object of `{ state: {...}, acitons: {...} }`.
 
-Function arguments are inherited from the second and subsequent arguments of the previously defined Action. The return value is a uniform `Promise<void>`.
+Function arguments are inherited from the second and subsequent arguments of the previously defined Action. The return value is a uniform `Promise<State>`.
 
 ```tsx
 const SomeConsumer = () => {

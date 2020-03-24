@@ -111,7 +111,9 @@ export class Store<S, A extends Impl<S, A>> {
     return (...args: any) =>
       new Promise<S>((resolve, reject) =>
         this.queue.push(async () => {
-          await passToImpl(args).then(() => resolve(this._state)).catch(reject);
+          await passToImpl(args)
+            .then(() => resolve(this._state))
+            .catch(reject);
         })
       );
   }
