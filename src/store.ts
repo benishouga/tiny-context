@@ -19,8 +19,8 @@ const extract = (obj: object) => {
   const set = new Set<string>();
   while (t) {
     Object.getOwnPropertyNames(t)
-      .filter(n => typeof (t as any)[n] === 'function' && !ignores.includes(n))
-      .forEach(n => set.add(n));
+      .filter((n) => typeof (t as any)[n] === 'function' && !ignores.includes(n))
+      .forEach((n) => set.add(n));
     t = Object.getPrototypeOf(t);
   }
   return Array.from(set);
@@ -86,12 +86,12 @@ export class Store<S, A extends Impl<S, A>> {
   private feed(newState: void | S) {
     if (newState !== null && newState !== undefined) {
       this._state = { ...newState };
-      this.listeners.forEach(listener => listener(this._state));
+      this.listeners.forEach((listener) => listener(this._state));
     }
   }
   private convertToExternals(impl: A) {
     const external: { [name: string]: (...args: any) => void | Promise<void> } = {};
-    extract(impl).forEach(name => (external[name] = this.convert((impl as any)[name].bind(impl))));
+    extract(impl).forEach((name) => (external[name] = this.convert((impl as any)[name].bind(impl))));
     return external as Externals<A>;
   }
   private convert(action: (state: S, ...args: any) => ImplResult<S>) {
@@ -111,9 +111,7 @@ export class Store<S, A extends Impl<S, A>> {
     return (...args: any) =>
       new Promise<void>((resolve, reject) =>
         this.queue.push(async () => {
-          await passToImpl(args)
-            .then(resolve)
-            .catch(reject);
+          await passToImpl(args).then(resolve).catch(reject);
         })
       );
   }

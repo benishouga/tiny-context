@@ -4,23 +4,23 @@ import { render, fireEvent } from '@testing-library/react';
 
 import { createTinyContext } from '../src/tiny-context';
 
-const wait10 = async () => new Promise(resolve => setTimeout(resolve, 10));
+const wait10 = async () => new Promise((resolve) => setTimeout(resolve, 10));
 
 describe('tiny-context', () => {
   describe('simple actions', () => {
     type State = { count: number };
     const { Provider, useContext } = createTinyContext<State>().actions({
-      increment: (state, amount: number) => ({ count: state.count + amount })
+      increment: (state, amount: number) => ({ count: state.count + amount }),
     });
     const IncrementButton = () => {
       const {
-        actions: { increment }
+        actions: { increment },
       } = useContext();
       return <button onClick={() => increment(1)}>button</button>;
     };
     const TwiceButton = () => {
       const {
-        actions: { increment }
+        actions: { increment },
       } = useContext();
       return (
         <button
@@ -35,7 +35,7 @@ describe('tiny-context', () => {
     };
     const Display = () => {
       const {
-        state: { count }
+        state: { count },
       } = useContext();
       return <>count is {count}</>;
     };
@@ -99,13 +99,13 @@ describe('tiny-context', () => {
     const { Provider, useContext } = createTinyContext<State, Actions>(new Actions());
     const IncrementButton = () => {
       const {
-        actions: { increment }
+        actions: { increment },
       } = useContext();
       return <button onClick={() => increment(1)}>button</button>;
     };
     const Display = () => {
       const {
-        state: { count }
+        state: { count },
       } = useContext();
       return <>count is {count}</>;
     };
@@ -128,17 +128,17 @@ describe('tiny-context', () => {
       increment: async (state, amount: number) => {
         await wait10(); // wait for event loop
         return { count: state.count + amount };
-      }
+      },
     });
     const IncrementButton = () => {
       const {
-        actions: { increment }
+        actions: { increment },
       } = useContext();
       return <button onClick={() => increment(1)}>button</button>;
     };
     const Display = () => {
       const {
-        state: { count }
+        state: { count },
       } = useContext();
       return <>count is {count}</>;
     };

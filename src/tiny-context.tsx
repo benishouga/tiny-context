@@ -7,7 +7,7 @@ type ContextState<S, A> = { state: S; actions: Externals<A> };
 
 const useRerender = () => {
   const [, set] = useState(0);
-  return useCallback(() => set(c => c + 1), [set]);
+  return useCallback(() => set((c) => c + 1), [set]);
 };
 
 type CreateResult<S, A> = { Provider: FC<PropsWithChildren<{ value: S }>>; useContext: () => ContextState<S, A> };
