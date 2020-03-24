@@ -157,7 +157,7 @@ Current `State`.
 
 `Actions` to change `State`.
 
-Function arguments are inherited from the second and subsequent arguments of the previously defined Action. The return value is a uniform `Promise<void>`.
+Function arguments are inherited from the second and subsequent arguments of the previously defined Action. The return value is a uniform `Promise<State>`.
 
 #### onChanged(listener)
 

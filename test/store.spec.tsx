@@ -23,12 +23,18 @@ describe('Store', () => {
     const spy = jest.fn();
     store.onChanged(spy);
     const { increment } = store.actions;
-    await increment(1);
+    {
+      const { count } = await increment(1);
+      expect(count).toBe(1);
+    }
     {
       const { count } = store.state;
       expect(count).toBe(1);
     }
-    await increment(2);
+    {
+      const { count } = await increment(2);
+      expect(count).toBe(3);
+    }
     {
       const { count } = store.state;
       expect(count).toBe(3);

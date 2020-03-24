@@ -6,8 +6,8 @@ export type Impl<S, A> = { [P in keyof A]: A[P] extends Function ? (s: S, ...arg
 
 type ToExternalParameter<T> = T extends (s: any, ...args: infer P) => any ? P : never;
 type FunctionOnly<T> = Pick<T, { [K in keyof T]: T[K] extends Function ? K : never }[keyof T]>;
-type ToExternalFunctoins<A> = { [P in keyof A]: (...args: ToExternalParameter<A[P]>) => Promise<void> };
-export type Externals<A> = ToExternalFunctoins<FunctionOnly<A>>;
+type ToExternalFunctoins<S, A> = { [P in keyof A]: (...args: ToExternalParameter<A[P]>) => Promise<S> };
+export type Externals<S, A> = ToExternalFunctoins<S, FunctionOnly<A>>;
 
 function isGenerator<S>(obj: any): obj is GeneratorResult<S> {
   return obj && typeof obj.next === 'function' && typeof obj.throw === 'function' && typeof obj.return === 'function';
@@ -74,7 +74,7 @@ export class Store<S, A extends Impl<S, A>> {
    *
    * Function arguments are inherited from the second and subsequent arguments of the previously defined Action. The return value is a uniform `Promise<void>`.
    */
-  public readonly actions: Externals<A>;
+  public readonly actions: Externals<S, A>;
   /**
    * Adds a change listener.
    * @returns this
@@ -90,9 +90,9 @@ export class Store<S, A extends Impl<S, A>> {
     }
   }
   private convertToExternals(impl: A) {
-    const external: { [name: string]: (...args: any) => void | Promise<void> } = {};
+    const external: any = {};
     extract(impl).forEach((name) => (external[name] = this.convert((impl as any)[name].bind(impl))));
-    return external as Externals<A>;
+    return external;
   }
   private convert(action: (state: S, ...args: any) => ImplResult<S>) {
     const passToImpl = async (args: any) => {
@@ -109,9 +109,9 @@ export class Store<S, A extends Impl<S, A>> {
       }
     };
     return (...args: any) =>
-      new Promise<void>((resolve, reject) =>
+      new Promise<S>((resolve, reject) =>
         this.queue.push(async () => {
-          await passToImpl(args).then(resolve).catch(reject);
+          await passToImpl(args).then(() => resolve(this._state)).catch(reject);
         })
       );
   }

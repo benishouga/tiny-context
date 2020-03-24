@@ -3,7 +3,7 @@ import { Externals, Impl, Store } from './store';
 
 export { Store };
 
-type ContextState<S, A> = { state: S; actions: Externals<A> };
+type ContextState<S, A> = { state: S; actions: Externals<S, A> };
 
 const useRerender = () => {
   const [, set] = useState(0);
