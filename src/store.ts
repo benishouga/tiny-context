@@ -2,9 +2,11 @@ type Result<S> = void | S | Promise<void> | Promise<S>;
 type GeneratorResult<S> = Generator<Result<S>, Result<S>, S> | AsyncGenerator<Result<S>, Result<S>, S>;
 type ImplResult<S> = Result<S> | GeneratorResult<S>;
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 export type Impl<S, A> = { [P in keyof A]: A[P] extends Function ? (s: S, ...args: any) => ImplResult<S> : any };
 
 type ToExternalParameter<T> = T extends (s: any, ...args: infer P) => any ? P : never;
+// eslint-disable-next-line @typescript-eslint/ban-types
 type FunctionOnly<T> = Pick<T, { [K in keyof T]: T[K] extends Function ? K : never }[keyof T]>;
 type ToExternalFunctoins<S, A> = { [P in keyof A]: (...args: ToExternalParameter<A[P]>) => Promise<S> };
 export type Externals<S, A> = ToExternalFunctoins<S, FunctionOnly<A>>;
@@ -14,7 +16,7 @@ function isGenerator<S>(obj: any): obj is GeneratorResult<S> {
 }
 
 let ignores: string[] = [];
-const extract = (obj: object) => {
+const extract = (obj: Record<string, unknown>) => {
   let t = obj;
   const set = new Set<string>();
   while (t) {
@@ -66,7 +68,7 @@ export class Store<S, A extends Impl<S, A>> {
     this.actions = this.convertToExternals(impl);
   }
   /** Current `State`. */
-  public get state() {
+  public get state(): S {
     return this._state;
   }
   /**
@@ -79,7 +81,7 @@ export class Store<S, A extends Impl<S, A>> {
    * Adds a change listener.
    * @returns this
    */
-  public onChanged(listener: Listener<S>) {
+  public onChanged(listener: Listener<S>): this {
     this.listeners.push(listener);
     return this;
   }
@@ -108,7 +110,7 @@ export class Store<S, A extends Impl<S, A>> {
         this.feed(result);
       }
     };
-    return (...args: any) =>
+    return (...args: any): Promise<S> =>
       new Promise<S>((resolve, reject) =>
         this.queue.push(async () => {
           await passToImpl(args)

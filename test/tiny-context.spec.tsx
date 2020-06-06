@@ -41,7 +41,7 @@ describe('tiny-context', () => {
     };
 
     test('createTinyContext can create a Provider and useContext instance.', () => {
-      const { Provider, useContext } = createTinyContext<{}, {}>({});
+      const { Provider, useContext } = createTinyContext<Record<string, unknown>, Record<string, unknown>>({});
       expect(Provider).toBeDefined();
       expect(useContext).toBeDefined();
     });
