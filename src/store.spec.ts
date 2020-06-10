@@ -1,4 +1,4 @@
-import { Store } from '../src/tiny-context';
+import { Store } from './tiny-context';
 
 const wait = async (number = 10) => new Promise((resolve) => setTimeout(resolve, number));
 const waitFor = async (condition: () => boolean, timeout = 50) => {
@@ -125,6 +125,7 @@ describe('Store', () => {
     const store = new Store({ count: 0 }, new Actions());
     store.onChanged(spy);
     const { iiincrement } = store.actions;
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     iiincrement(1);
     {
       await waitFor(() => store.state.count === 1);

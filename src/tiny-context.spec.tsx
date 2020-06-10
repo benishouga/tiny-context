@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom/extend-expect';
+import '@testing-library/jest-dom';
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 
@@ -25,8 +25,8 @@ describe('tiny-context', () => {
       return (
         <button
           onClick={() => {
-            increment(1);
-            increment(1);
+            void increment(1);
+            void increment(1);
           }}
         >
           button
@@ -83,7 +83,7 @@ describe('tiny-context', () => {
       expect(await findByText('count is 2')).toBeDefined();
     });
 
-    test('Provider does not throw an error if no children.', async () => {
+    test('Provider does not throw an error if no children.', () => {
       render(<Provider value={{ count: 0 }} />);
       expect(true).toBeTruthy();
     });

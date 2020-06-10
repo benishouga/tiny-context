@@ -93,8 +93,9 @@ export class Store<S, A extends Impl<S, A>> {
   }
   private convertToExternals(impl: A) {
     const external: any = {};
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     extract(impl).forEach((name) => (external[name] = this.convert((impl as any)[name].bind(impl))));
-    return external;
+    return external as Externals<S, A>;
   }
   private convert(action: (state: S, ...args: any) => ImplResult<S>) {
     const passToImpl = async (args: any) => {
