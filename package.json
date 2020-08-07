@@ -67,7 +67,7 @@
     "react-dom": "16.13.1",
     "react-syntax-highlighter": "13.2.1",
     "rimraf": "3.0.2",
-    "rollup": "2.23.0",
+    "rollup": "2.23.1",
     "rollup-plugin-terser": "6.1.0",
     "rollup-plugin-typescript2": "0.27.2",
     "ts-jest": "26.1.4",
