@@ -6,6 +6,7 @@ import pkg from './package.json';
 
 const input = 'src/tiny-context.tsx';
 const external = [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})];
+const excludeSpecFiles = { exclude: ["**/*.spec.ts", "**/*.spec.tsx"] };
 const noDeclarationFiles = { compilerOptions: { declaration: false } };
 
 export default [
@@ -14,7 +15,7 @@ export default [
     input,
     output: { file: 'lib/tiny-context.js', format: 'cjs', indent: false },
     external,
-    plugins: [typescript()]
+    plugins: [typescript({ tsconfigOverride: excludeSpecFiles })]
   },
   // ES
   {
