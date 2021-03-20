@@ -12,6 +12,7 @@ type ToExternalFunctoins<S, A> = { [P in keyof A]: (...args: ToExternalParameter
 export type Externals<S, A> = ToExternalFunctoins<S, FunctionOnly<A>>;
 
 function isGenerator<S>(obj: any): obj is GeneratorResult<S> {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return obj && typeof obj.next === 'function' && typeof obj.throw === 'function' && typeof obj.return === 'function';
 }
 

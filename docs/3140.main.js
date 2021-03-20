@@ -1,0 +1,1 @@
+(self.webpackChunktiny_context=self.webpackChunktiny_context||[]).push([[3140],{561:e=>{"use strict";function a(e){e.languages.hsts={directive:{pattern:/\b(?:max-age=|includeSubDomains|preload)/,alias:"keyword"},safe:{pattern:/\b\d{8,}\b/,alias:"selector"},unsafe:{pattern:/\b\d{1,7}\b/,alias:"function"}}}e.exports=a,a.displayName="hsts",a.aliases=[]}}]);

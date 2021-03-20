@@ -85,7 +85,7 @@ import { createTinyContext } from 'tiny-context';
 
 type CounterState = { count: number; };
 class CounterActions {
-  increment: (state: CounterState, amount: number) => ({ ...state, count: state.count + amount })
+  increment: (state: CounterState, amount: number) => ({ ...state, count: state.count + amount }),
   decrement: (state: CounterState, amount: number) => ({ ...state, count: state.count - amount })
 }
 const { Provider, useContext } = createTinyContext<CounterState, CounterActions>(new CounterActions());
