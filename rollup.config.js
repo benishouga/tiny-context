@@ -1,12 +1,10 @@
-/* eslint-disable @typescript-eslint/camelcase */
-
 import typescript from 'rollup-plugin-typescript2';
 import { terser } from 'rollup-plugin-terser';
 import pkg from './package.json';
 
 const input = 'src/tiny-context.tsx';
 const external = [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})];
-const excludeSpecFiles = { exclude: ["**/*.spec.ts", "**/*.spec.tsx"] };
+const excludeSpecFiles = { exclude: ['**/*.spec.ts', '**/*.spec.tsx'] };
 const noDeclarationFiles = { compilerOptions: { declaration: false } };
 
 export default [
@@ -15,14 +13,14 @@ export default [
     input,
     output: { file: 'lib/tiny-context.js', format: 'cjs', indent: false },
     external,
-    plugins: [typescript({ tsconfigOverride: excludeSpecFiles })]
+    plugins: [typescript({ tsconfigOverride: excludeSpecFiles })],
   },
   // ES
   {
     input,
     output: { file: 'es/tiny-context.js', format: 'es', indent: false },
     external,
-    plugins: [typescript({ tsconfigOverride: noDeclarationFiles })]
+    plugins: [typescript({ tsconfigOverride: noDeclarationFiles })],
   },
   // ES for Browsers
   {
@@ -36,10 +34,10 @@ export default [
           pure_getters: true,
           unsafe: true,
           unsafe_comps: true,
-          warnings: false
-        }
-      })
-    ]
+          warnings: false,
+        },
+      }),
+    ],
   },
   // UMD Development
   {
@@ -49,10 +47,10 @@ export default [
       format: 'umd',
       name: 'tiny-context',
       indent: false,
-      globals: { react: 'React' }
+      globals: { react: 'React', immer: 'Immer' },
     },
     external,
-    plugins: [typescript({ tsconfigOverride: noDeclarationFiles })]
+    plugins: [typescript({ tsconfigOverride: noDeclarationFiles })],
   },
   // UMD Production
   {
@@ -62,7 +60,7 @@ export default [
       format: 'umd',
       name: 'tiny-context',
       indent: false,
-      globals: { react: 'React' }
+      globals: { react: 'React', immer: 'Immer' },
     },
     external,
     plugins: [
@@ -72,9 +70,9 @@ export default [
           pure_getters: true,
           unsafe: true,
           unsafe_comps: true,
-          warnings: false
-        }
-      })
-    ]
-  }
+          warnings: false,
+        },
+      }),
+    ],
+  },
 ];

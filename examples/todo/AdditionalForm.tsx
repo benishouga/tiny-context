@@ -1,29 +1,24 @@
 import React, { useState } from 'react';
 import { useTodoContext } from './TodoProvider';
 
-export const AdditionalForm = () => {
+export const AdditionalForm = (): JSX.Element => {
   const {
-    state: { progress },
-    actions: { add }
+    actions: { add },
   } = useTodoContext();
-
   const [text, setText] = useState('');
 
-  const onAddClick = async () => {
+  const onAddClick = () => {
     if (!text) {
       return;
     }
-    await add({ text, completed: false });
+    add({ text, completed: false });
     setText('');
   };
 
   return (
     <div>
-      <input disabled={progress} type="text" value={text} onChange={e => setText(e.target.value)} />
-      <button disabled={progress} onClick={onAddClick}>
-        add
-      </button>
-      {progress ? 'Now processing...' : ''}
+      <input type="text" value={text} onChange={(e) => setText(e.target.value)} />
+      <button onClick={onAddClick}>add</button>
     </div>
   );
 };

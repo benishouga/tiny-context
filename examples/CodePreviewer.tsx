@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { PrismAsyncLight as ReactSyntaxHighlight } from 'react-syntax-highlighter';
 import { prism as style } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
-export const CodePreviewer = ({ name, code }: { name: string; code: string }) => {
+export const CodePreviewer = ({ name, code }: { name: string; code: string }): JSX.Element => {
   const [previewing, setPreviewing] = useState(false);
   return (
     <div
@@ -10,10 +10,10 @@ export const CodePreviewer = ({ name, code }: { name: string; code: string }) =>
         backgroundColor: '#f8f8f8',
         margin: '8px',
         borderRadius: '4px',
-        border: '1px solid #ccc'
+        border: '1px solid #ccc',
       }}
     >
-      <p style={{ margin: '0', padding: '8px' }} onClick={() => setPreviewing(c => !c)}>
+      <p style={{ margin: '0', padding: '8px' }} onClick={() => setPreviewing((c) => !c)}>
         <span style={{ width: '20px', display: 'inline-block' }}>{previewing ? '-' : '+'}</span> {name}
       </p>
       {previewing ? (

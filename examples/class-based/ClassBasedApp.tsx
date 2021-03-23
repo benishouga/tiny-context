@@ -1,5 +1,5 @@
 import React from 'react';
-import { createTinyContext } from '../../src/tiny-context';
+import { connect } from '../../src/tiny-context';
 
 type State = { count: number };
 
@@ -9,11 +9,11 @@ class Actions {
   }
 }
 
-const { Provider, useContext } = createTinyContext<State, Actions>(new Actions());
+const { Provider, useContext } = connect<State>().to(new Actions());
 
 const Button = () => {
   const {
-    actions: { increment }
+    actions: { increment },
   } = useContext();
 
   return <button onClick={() => increment(1)}>+</button>;
@@ -21,12 +21,12 @@ const Button = () => {
 
 const Display = () => {
   const {
-    state: { count }
+    state: { count },
   } = useContext();
   return <>{count}</>;
 };
 
-export const ClassBasedApp = () => (
+export const ClassBasedApp = (): JSX.Element => (
   <Provider value={{ count: 0 }}>
     ClassBasedApp: <Button /> <Display />
   </Provider>

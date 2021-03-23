@@ -1,16 +1,14 @@
 import React from 'react';
 import { useTodoContext, Todo } from './TodoProvider';
 
-export const TodoList = () => {
+export const TodoList = (): JSX.Element => {
   const {
-    state: { todos, progress },
-    actions: { update, showProgress, hideProgress }
+    state: { todos },
+    actions: { update },
   } = useTodoContext();
 
-  const onChange = async (i: number, todo: Todo, checked: boolean) => {
-    await showProgress();
-    await update(i, { ...todo, completed: checked });
-    await hideProgress();
+  const onChange = (i: number, todo: Todo, checked: boolean) => {
+    update(i, { ...todo, completed: checked });
   };
 
   return (
@@ -20,9 +18,8 @@ export const TodoList = () => {
           <input
             id={`${i}_check`}
             type="checkbox"
-            disabled={progress}
             checked={todo.completed}
-            onChange={e => onChange(i, todo, e.target.checked)}
+            onChange={(e) => onChange(i, todo, e.target.checked)}
           />
           <label htmlFor={`${i}_check`}>
             <span style={{ textDecoration: todo.completed ? 'line-through' : '' }}>{todo.text}</span>

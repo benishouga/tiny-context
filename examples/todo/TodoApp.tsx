@@ -3,7 +3,7 @@ import { TodoProvider } from './TodoProvider';
 import { AdditionalForm } from './AdditionalForm';
 import { TodoList } from './TodoList';
 
-const TodoApp = () => {
+const TodoApp = (): JSX.Element => {
   return (
     <TodoProvider>
       <p>TodoApp</p>

@@ -3,5 +3,6 @@
   "compilerOptions": {
     "declaration": false,
     "rootDir": "."
-  }
+  },
+  "include": ["src", "examples"]
 }
